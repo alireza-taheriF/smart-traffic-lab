@@ -1,0 +1,1384 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}html{padding-top:env(safe-area-inset-top,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body>
+<title>آزمایشگاه چراغ هوشمند</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f1f4f3; --surface:#ffffff; --surface2:#e9eeed; --fg:#14201f; --muted:#566866; --line:#d3dcda;
+  --smart:#0b7a75; --smart-soft:#d8efec; --cur:#a85f0a; --cur-soft:#f6e6cf;
+  --good:#1b8a4b; --bad:#c23b2e; --warn:#b7791f;
+  --ground:#e4ebe7; --block:#d3ddd6; --walk:#c6cfcb; --road:#4a5254; --mark:#eceee9; --curb:#2e3436;
+  --sig-r:#e5484d; --sig-y:#f5b324; --sig-g:#2fc46c; --housing:#1b2224;
+  --shadow:0 1px 2px rgba(20,32,31,.08),0 4px 14px rgba(20,32,31,.06);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1514; --surface:#162120; --surface2:#1e2d2b; --fg:#e5eeed; --muted:#93a9a6; --line:#2b3c3a;
+  --smart:#43c9bf; --smart-soft:#123633; --cur:#e5a548; --cur-soft:#3a2b12;
+  --good:#44c47c; --bad:#ff7466; --warn:#e5a548;
+  --ground:#101a19; --block:#16231f; --walk:#25302f; --road:#2f383a; --mark:#c9d1cd; --curb:#05090a; --housing:#050909;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1514; --surface:#162120; --surface2:#1e2d2b; --fg:#e5eeed; --muted:#93a9a6; --line:#2b3c3a;
+  --smart:#43c9bf; --smart-soft:#123633; --cur:#e5a548; --cur-soft:#3a2b12;
+  --good:#44c47c; --bad:#ff7466; --warn:#e5a548;
+  --ground:#101a19; --block:#16231f; --walk:#25302f; --road:#2f383a; --mark:#c9d1cd; --curb:#05090a; --housing:#050909;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:"Vazirmatn",Tahoma,system-ui,sans-serif;font-size:14px;line-height:1.7;
+  padding-block:16px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font-size:22px;font-weight:800;margin:0;letter-spacing:0}
+h2{font-size:15px;font-weight:800;margin:0}
+p{margin:0}
+.muted{color:var(--muted)}
+header{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+header .sub{max-width:70ch;color:var(--muted)}
+button,select,input{font:inherit;color:inherit}
+.btn{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 12px;cursor:pointer;min-height:36px;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--smart);outline-offset:2px}
+.btn.on{background:var(--smart);border-color:var(--smart);color:#fff}
+:root[data-theme="dark"] .btn.on{color:#06201e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.on{color:#06201e}}
+.btn.ev{border-color:var(--bad)}
+.btn.ev:hover{background:var(--bad);color:#fff}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.controls{padding:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px 22px}
+.grp{display:flex;flex-direction:column;gap:8px;min-width:0}
+.grp>label,.grp>.lab{font-weight:600;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+select{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 10px;min-height:36px;max-width:100%}
+input[type=range]{width:100%;accent-color:var(--smart);min-height:28px}
+.val{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;cursor:pointer}
+.chk input{margin-top:5px}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.panels.stack{grid-template-columns:1fr}
+.panels.stack canvas{max-width:760px;margin-inline:auto}
+.panel{padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.panel-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.tag{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.cur .dot{background:var(--cur)}.smart .dot{background:var(--smart)}
+.cur .tag{color:var(--cur)}.smart .tag{color:var(--smart)}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.kpis b{color:var(--fg);font-variant-numeric:tabular-nums;font-size:13px}
+canvas{width:100%;display:block;border-radius:10px;background:var(--ground)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted);padding:2px 4px}
+.legend i{display:inline-block;width:12px;height:8px;border-radius:2px;margin-inline-end:5px;vertical-align:middle}
+.two{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+.sec{padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 8px;text-align:start;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:12px}
+td.n{font-variant-numeric:tabular-nums;font-weight:600}
+td.cur{color:var(--cur)}td.smart{color:var(--smart)}
+.delta{font-size:12px;font-weight:600;white-space:nowrap}
+.delta.good{color:var(--good)}.delta.bad{color:var(--bad)}.delta.eq{color:var(--muted)}
+.scroll{overflow-x:auto}
+.banner{padding:12px 14px;border-radius:12px;background:var(--smart-soft);border:1px solid var(--smart);font-weight:600}
+.log{max-height:290px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;padding-inline-end:4px}
+.log div{border-inline-start:3px solid var(--line);padding:2px 8px;font-size:12.5px;line-height:1.6}
+.log div.decide{border-color:var(--smart)}
+.log div.kernel{border-color:var(--warn)}
+.log div.ev{border-color:var(--bad)}
+.log div.watchdog{border-color:var(--cur)}
+.log div.risk{border-color:var(--bad);background:var(--cur-soft)}
+.log time{color:var(--muted);font-variant-numeric:tabular-nums;margin-inline-end:6px}
+.bars{display:flex;flex-direction:column;gap:6px}
+.bar{display:grid;grid-template-columns:54px 1fr 38px;gap:8px;align-items:center;font-size:12px}
+.bar .track{height:12px;background:var(--surface2);border-radius:6px;overflow:hidden}
+.bar .fill{height:100%;background:var(--smart);border-radius:6px;transition:width .25s}
+.bar .fill.on{background:var(--good)}
+.chip{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--surface2)}
+.chip.smart{background:var(--smart-soft);color:var(--smart)}
+.chip.ev{background:var(--bad);color:#fff}
+.chip.wd{background:var(--cur-soft);color:var(--cur)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:5px 12px;cursor:pointer;min-height:32px}
+.seg button.on{background:var(--smart);color:#fff}
+:root[data-theme="dark"] .seg button.on{color:#06201e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .seg button.on{color:#06201e}}
+details{border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;font-weight:600}
+.map td:first-child{font-weight:600}
+.note{font-size:12.5px;color:var(--muted)}
+@media (max-width:860px){.panels,.two{grid-template-columns:1fr}}
+@media (max-width:520px){h1{font-size:19px}.kpis{gap:8px 12px}}
+</style>
+
+<div class="wrap" dir="rtl" lang="fa">
+<header>
+  <div>
+    <h1>آزمایشگاه چراغ هوشمند</h1>
+    <p class="sub">همان ترافیکِ تصادفی، هم‌زمان روی دو چهارراه: چراغ زمان‌ثابتِ رایج در ایران و سیستم هوشمندِ مبتنی بر معماری سندِ قبلی. حجم را تغییر دهید، آمبولانس بفرستید و تصمیم‌های سیستم را زنده ببینید.</p>
+  </div>
+  <button class="btn" id="theme" type="button" aria-label="تغییر تم">◐ تم</button>
+</header>
+
+<section class="card controls" aria-label="کنترل‌ها">
+  <div class="grp">
+    <label for="scn">نوع تقاطع</label>
+    <select id="scn"></select>
+    <div class="row">
+      <button class="btn" id="rand" type="button">🎲 ترافیک تصادفی جدید</button>
+      <span class="val" id="seedv"></span>
+    </div>
+    <label for="lm">نوع چراغ گردش به چپ</label>
+    <select id="lm"><option value="protected">چپ محافظت‌شده (مثل مشهد): لاین چپ جدا + فلش چپ</option><option value="permissive">چپ آزاد: بدون فلش، با رعایت حق تقدم</option></select>
+    <label class="chk"><input type="checkbox" id="auto"><span>رویدادهای تصادفی (هجوم ناگهانی ترافیک و ورود خودروی اورژانس)</span></label>
+  </div>
+  <div class="grp">
+    <span class="lab">حجم ترافیک</span>
+    <div class="row" id="presets"></div>
+    <input type="range" id="rate" min="100" max="1300" step="10" aria-label="حجم ترافیک">
+    <span class="val" id="ratev"></span>
+    <button class="btn" id="surge" type="button">⚡ هجوم ناگهانی از یک ورودی (۹۰ ثانیه)</button>
+  </div>
+  <div class="grp">
+    <span class="lab">خودروی اورژانس (از ورودی تصادفی)</span>
+    <div class="row">
+      <button class="btn ev" data-ev="amb" type="button">🚑 آمبولانس</button>
+      <button class="btn ev" data-ev="fire" type="button">🚒 آتش‌نشانی</button>
+      <button class="btn ev" data-ev="police" type="button">🚓 پلیس</button>
+    </div>
+    <span class="note">اولویت: آمبولانس = آتش‌نشانی &gt; پلیس &gt; عادی. هم‌زمان چند اورژانس هم می‌شود فرستاد.</span>
+  </div>
+  <div class="grp">
+    <span class="lab">زمان و سرعت</span>
+    <div class="row">
+      <button class="btn" id="pause" type="button">⏸ توقف</button>
+      <div class="seg" id="speed" role="group" aria-label="سرعت"></div>
+      <button class="btn" id="reset" type="button">↺ شروع دوباره</button>
+    </div>
+    <span class="lab">نما</span><div class="row"><div class="seg" id="viewsel" role="group" aria-label="بزرگنمایی"></div><div class="seg" id="laysel" role="group" aria-label="چیدمان"></div></div>
+    <label for="gf" class="lab" style="margin-top:2px">سبز در چراغ فعلی (زمان‌ثابت): <span class="val" id="gfv"></span></label>
+    <input type="range" id="gf" min="15" max="70" step="1">
+    <label for="lf" class="lab">فلش چپ در چراغ فعلی: <span class="val" id="lfv"></span></label>
+    <input type="range" id="lf" min="5" max="30" step="1">
+  </div>
+  <div class="grp">
+    <span class="lab">سناریوی آزمایشی</span>
+    <label class="chk"><input type="checkbox" id="fault"><span>خرابی حسگر در سیستم هوشمند (ناظر باید به برنامه‌ی ثابت برگردد)</span></label>
+    <label class="chk"><input type="checkbox" id="risk" checked><span>در وضع فعلی، اورژانسِ گیرکرده پس از ۵ ثانیه با ریسک از قرمز رد شود</span></label>
+    <label class="chk"><input type="checkbox" id="evm" checked><span>ماژول اولویت اورژانس در سیستم هوشمند فعال باشد</span></label>
+    <label class="chk"><input type="checkbox" id="coop" checked><span>هماهنگی همسایه‌ها (پیام ورودیِ بالادست) در چند تقاطع</span></label>
+  </div>
+</section>
+
+<div class="banner" id="banner" role="status">در حال گردآوری نتیجه…</div>
+
+<section class="panels" id="panels">
+  <div class="card panel cur">
+    <div class="panel-h"><span class="tag"><span class="dot"></span>وضع فعلی ایران · زمان‌ثابت با شمارش‌معکوس</span></div>
+    <div class="kpis" id="kc"></div>
+    <canvas id="cv-cur" aria-label="شبیه‌سازی چراغ زمان‌ثابت"></canvas>
+  </div>
+  <div class="card panel smart">
+    <div class="panel-h"><span class="tag"><span class="dot"></span>سیستم هوشمند · ادراک ← تصمیم ← هسته‌ی ایمنی</span></div>
+    <div class="kpis" id="ks"></div>
+    <canvas id="cv-smart" aria-label="شبیه‌سازی چراغ هوشمند"></canvas>
+  </div>
+</section>
+<div class="legend">
+  <span><i style="background:#9fb3b0"></i>خودرو</span><span><i style="background:#f0c24a;width:7px"></i>موتور</span>
+  <span><i style="background:#fff;border:1px solid #c23b2e"></i>آمبولانس</span><span><i style="background:#d33"></i>آتش‌نشانی</span><span><i style="background:#2f6fe0"></i>پلیس</span>
+  <span><i style="background:transparent;border:2px solid #e5484d"></i>حلقه‌ی قرمز = بیش از ۹۰ ثانیه منتظر</span>
+  <span>🔵 حلقه دور تقاطع = پیش‌دستی اورژانس</span>
+  <span><span id="lanenote"></span></span>
+</div>
+
+<section class="two">
+  <div class="card sec">
+    <h2>مقایسه‌ی زنده</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>شاخص</th><th>وضع فعلی</th><th>هوشمند</th><th>تفاوت</th></tr></thead>
+      <tbody id="mt"></tbody>
+    </table></div>
+    <p class="note">شبیه‌سازی گویاست، نه واسنجی‌شده با داده‌ی مشهد: ارقام نسبیِ دو سیستم روی یک ترافیکِ یکسان معنا دارند، نه عدد مطلق. در اشباع کامل، هر دو ناچار صف می‌بندند و برتری هوشمند کم می‌شود.</p>
+  </div>
+  <div class="card sec">
+    <div class="row" style="justify-content:space-between">
+      <h2>روند در زمان</h2>
+      <div class="seg" id="chartsel" role="group" aria-label="نوع نمودار"></div>
+    </div>
+    <canvas id="chart" style="height:210px" aria-label="نمودار مقایسه"></canvas>
+    <div class="legend"><span><i style="background:var(--cur)"></i>وضع فعلی</span><span><i style="background:var(--smart)"></i>هوشمند</span></div>
+  </div>
+</section>
+
+<section class="two">
+  <div class="card sec">
+    <div class="row" style="justify-content:space-between">
+      <h2>سیستم هوشمند الان چه می‌بیند و چرا</h2>
+      <select id="nodesel" aria-label="انتخاب تقاطع"></select>
+    </div>
+    <div class="row" id="mode"></div>
+    <div class="bars" id="bars"></div>
+    <p class="note" id="pnote"></p>
+    <h2 style="margin-top:6px">گزارش تصمیم‌ها</h2>
+    <div class="log" id="dlog"></div>
+  </div>
+  <div class="card sec">
+    <h2>رویدادهای اورژانس و ایمنی</h2>
+    <div class="log" id="elog"></div>
+    <details>
+      <summary>این ماژول‌ها در دنیای واقعی کجا می‌نشینند؟</summary>
+      <div class="scroll"><table class="map">
+        <thead><tr><th>ماژول در شبیه‌ساز</th><th>لایه‌ی واقعی</th></tr></thead>
+        <tbody>
+          <tr><td>perceive()</td><td>جعبه‌ی لبه کنار کنترلر: دوربین/رادار/حلقه ← صف و جریان با «اطمینان»</td></tr>
+          <tr><td>smartCtl() — فشار و gap-out</td><td>سرویس تصمیم (قاعده‌محور اکنون، RL بعداً) روی همان جعبه</td></tr>
+          <tr><td>request() — هسته‌ی ایمنی</td><td>ماژول جدا و ساده در مسیر فرمان؛ تنها راه رسیدن به چراغ؛ تأییدشدنی</td></tr>
+          <tr><td>evModule() — دید + صدا / GPS</td><td>گیرنده‌ی اولویت (SRM/SSM یا نوری/صوتی) با گیت AND و ثبت سوءاستفاده</td></tr>
+          <tr><td>advanceSignal() — تمام‌قرمز پویا</td><td>تمام‌قرمز حداقل ۱ ثانیه و تا خالی‌شدن واقعی تقاطع (از حسگر)؛ هسته‌ی ایمنی هرگز کمتر از حداقل را نمی‌پذیرد</td></tr>
+          <tr><td>watchdog()</td><td>ناظر سخت‌افزاری: افت اطمینان ← برنامه‌ی ثابت فعلی کنترلر</td></tr>
+          <tr><td>fixedCtl()</td><td>همان برنامه‌ی زمان‌ثابت موجود؛ همیشه آماده به‌عنوان حالت امن</td></tr>
+        </tbody></table></div>
+      <p class="note" style="margin-top:8px">هسته‌ی این صفحه (traffic-core) فقط منطق خالص است و به صفحه وابسته نیست؛ همان ماژول‌ها را می‌توان با ورودی حسگر واقعی و خروجی NTCIP به کنترلر وصل کرد. پیشنهاد استقرار: ابتدا حالت «فقط مشاهده»، سپس «مشورتی»، آخر «مستقیم».</p>
+    </details>
+  </div>
+</section>
+<footer class="note" style="padding:6px 2px 0">
+  منبع‌باز (MIT): <a href="https://github.com/alireza-taheriF/smart-traffic-lab" target="_blank" rel="noopener" style="color:var(--smart)">github.com/alireza-taheriF/smart-traffic-lab</a>
+  · الگوریتم، بنچمارک کامل و مستندات در مخزن.
+</footer>
+</div>
+
+<script>
+/* traffic-core.js — simulation core for the traffic-signal comparison lab.
+   Two independent simulators (fixed-time "current" vs. "smart") are driven by ONE shared demand stream,
+   so both see the identical vehicles at the identical times.
+   Modules mirror the architecture document: Perception → Decider → Safety kernel → Signal, + EV priority + Watchdog. */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.TrafficLab = factory();
+})(this, function () {
+  'use strict';
+
+  /* ---------- constants (meters, seconds) ---------- */
+  var R = 13, LW = 3.3, LANES = 2, SPACING = 180, ENTRY = 125;
+  var V_LINK = 13.9;           // 50 km/h
+  var YELLOW = 3, ALLRED = 2;
+  var MIN_GREEN = 12, MIN_GREEN_EV = 5, MAX_GREEN = 55, MAX_WAIT = 130, EV_HOLD_MAX = 45;
+  var B = 4.2, TAU = 1.0, MINGAP = 1.8;
+  var GPS_RANGE = 230, VIS_RANGE = 110;
+  var SIDES = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+  var SIDE_FA = ['شمال', 'شرق', 'جنوب', 'غرب'];
+  var LEN = { car: 4.6, moto: 2.2, amb: 6.0, fire: 9.5, police: 4.8 };
+  var ACC = { car: 2.6, moto: 3.6, amb: 3.4, fire: 2.2, police: 3.8 };
+  var VF = { car: 1.0, moto: 1.08, amb: 1.15, fire: 1.05, police: 1.15 };
+  var EVRANK = { amb: 3, fire: 3, police: 2 };
+  var KIND_FA = { car: 'خودرو', moto: 'موتور', amb: 'آمبولانس', fire: 'آتش‌نشانی', police: 'پلیس' };
+  var CRAWL = 6;
+
+  var TUNE = { ratio: 2.2, off: 4, minT: 13, minL: 10, leftThr: 2.7, gap: 2, maxL: 23, maxT: 68, waitDiv: 25, dynAR: 1 };
+  var opp = function (s) { return (s + 2) % 4; };
+  var right = function (dx, dy) { return [-dy, dx]; };
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  /* ---------- scenarios ---------- */
+  var SCENARIOS = {
+    cross: { name: 'چهارراه', nodes: [[0, 0]] },
+    tee: { name: 'سه‌راه', nodes: [[0, 0]], missing: { '0,0': [0] } },
+    corridor: { name: 'کریدور ۳ چهارراه', nodes: [[0, 0], [1, 0], [2, 0]] },
+    grid: { name: 'شبکه ۲×۲', nodes: [[0, 0], [1, 0], [0, 1], [1, 1]] }
+  };
+
+  /* ---------- network builder ---------- */
+  function lanePt(n, s, inbound, far, lane) {
+    var h = inbound ? [-SIDES[s][0], -SIDES[s][1]] : SIDES[s];
+    var r = right(h[0], h[1]);
+    var d = R + (far ? ENTRY : 0), lat = (lane + 0.5) * LW;
+    return { x: n.x + SIDES[s][0] * d + r[0] * lat, y: n.y + SIDES[s][1] * d + r[1] * lat };
+  }
+
+
+  function buildNetwork(key, prot) {
+    var sc = SCENARIOS[key];
+    var NL = prot ? 3 : 2;
+    // protected: lane0 = left only, lane1 = through, lane2 = through+right; permissive: lane0 = left+through, lane1 = through+right
+    var LANE_TURNS = prot ? [[3], [0], [0, 1]] : [[3, 0], [0, 1]];
+    var nodes = [], links = [], conns = [], entries = [], byPos = {};
+    sc.nodes.forEach(function (p, i) {
+      var n = { id: i, gx: p[0], gy: p[1], x: p[0] * SPACING, y: p[1] * SPACING, sides: [true, true, true, true],
+        inL: [null, null, null, null], outL: [null, null, null, null], conn: [0, 1, 2, 3].map(function () { return [[], [], []]; }), connList: [],
+        phases: [], phaseOf: [-1, -1, -1, -1], sig: null };
+      var miss = (sc.missing && sc.missing[p.join(',')]) || [];
+      miss.forEach(function (s) { n.sides[s] = false; });
+      nodes.push(n); byPos[p.join(',')] = n;
+    });
+    function mkLink(kind, A, Bp, props) {
+      var dx = Bp.x - A.x, dy = Bp.y - A.y, len = Math.sqrt(dx * dx + dy * dy);
+      var L = { id: links.length, kind: kind, ax: A.x, ay: A.y, bx: Bp.x, by: Bp.y, len: len, dx: dx / len, dy: dy / len,
+        vlim: V_LINK, toNode: null, toSide: -1, fromNode: null, fromSide: -1, vehicles: [] };
+      for (var k in props) L[k] = props[k];
+      links.push(L); return L;
+    }
+    nodes.forEach(function (n) {
+      for (var s = 0; s < 4; s++) {
+        if (!n.sides[s]) continue;
+        var m = byPos[(n.gx + SIDES[s][0]) + ',' + (n.gy + SIDES[s][1])];
+        if (m && m.sides[opp(s)]) {
+          // internal directed link n(out side s) -> m(in side opp(s))
+          n.outL[s] = []; m.inL[opp(s)] = [];
+          for (var ln = 0; ln < NL; ln++) {
+            var L = mkLink('internal', lanePt(n, s, false, false, ln), lanePt(m, opp(s), true, false, ln),
+              { fromNode: n, fromSide: s, toNode: m, toSide: opp(s), lane: ln });
+            n.outL[s].push(L); m.inL[opp(s)].push(L);
+          }
+        } else if (!m) {
+          var A = { weight: (s % 2 === 0) ? 0.65 : 1.0, toNode: n, toSide: s, lanes: [], idx: entries.length,
+            label: SIDE_FA[s] + (sc.nodes.length > 1 ? ' (چهارراه ' + (n.id + 1) + ')' : '') };
+          entries.push(A); n.inL[s] = []; n.outL[s] = [];
+          for (var ln2 = 0; ln2 < NL; ln2++) {
+            var E = mkLink('entry', lanePt(n, s, true, true, ln2), lanePt(n, s, true, false, ln2), { toNode: n, toSide: s, lane: ln2, approach: A });
+            A.lanes.push(E); n.inL[s].push(E);
+            n.outL[s].push(mkLink('exit', lanePt(n, s, false, false, ln2), lanePt(n, s, false, true, ln2), { fromNode: n, fromSide: s, lane: ln2 }));
+          }
+        }
+      }
+    });
+    // connectors
+    nodes.forEach(function (n) {
+      for (var a = 0; a < 4; a++) {
+        if (!n.sides[a]) continue;
+        for (var b = 0; b < 4; b++) {
+          if (!n.sides[b] || b === a) continue;
+          var h = opp(a), turn = (b - h + 4) % 4;
+          for (var lane = 0; lane < NL; lane++) {
+          if (LANE_TURNS[lane].indexOf(turn) < 0) continue;
+          var P0 = lanePt(n, a, true, false, lane), P2 = lanePt(n, b, false, false, lane), P1;
+          if (turn === 0) P1 = { x: (P0.x + P2.x) / 2, y: (P0.y + P2.y) / 2 };
+          else if (SIDES[h][0] !== 0) P1 = { x: P2.x, y: P0.y };
+          else P1 = { x: P0.x, y: P2.y };
+          var pts = [], cum = [0], N = 16;
+          for (var i = 0; i <= N; i++) {
+            var t = i / N, u = 1 - t;
+            pts.push({ x: u * u * P0.x + 2 * u * t * P1.x + t * t * P2.x, y: u * u * P0.y + 2 * u * t * P1.y + t * t * P2.y });
+            if (i > 0) cum.push(cum[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+          }
+          var C = { id: conns.length, kind: 'conn', node: n, a: a, b: b, turn: turn, pts: pts, cum: cum, len: cum[N],
+            vehicles: [], conflicts: [], vlim: turn === 0 ? 10 : (turn === 1 ? 5.5 : 6.5), inLink: n.inL[a][lane], outLink: n.outL[b][lane], lane: lane };
+          conns.push(C); n.conn[a][lane][b] = C; n.connList.push(C);
+          }
+        }
+      }
+      n.connList.forEach(function (c1) {
+        n.connList.forEach(function (c2) {
+          if (c1 === c2 || c1.a === c2.a) return;
+          var conflict = false;
+          if (c1.b === c2.b && c1.lane === c2.lane) conflict = true;
+          else {
+            for (var i = 0; i < c1.pts.length && !conflict; i++)
+              for (var j = 0; j < c2.pts.length; j++)
+                if (Math.hypot(c1.pts[i].x - c2.pts[j].x, c1.pts[i].y - c2.pts[j].y) < 2.7) { conflict = true; break; }
+          }
+          if (conflict) c1.conflicts.push(c2);
+        });
+      });
+      n.protected = !!prot;
+      [[0, 2], [1, 3]].forEach(function (axis) {
+        var sides = axis.filter(function (s) { return n.sides[s]; });
+        if (!sides.length) return;
+        var nm = sides.map(function (s) { return SIDE_FA[s]; }).join(' و ');
+        var hasLeft = sides.some(function (s) { return n.sides[(opp(s) + 3) % 4]; });
+        var noThrough = sides.every(function (s) { return !n.sides[opp(s)]; });   // T-junction stem: left+right never conflict -> one phase
+        if (prot && noThrough) n.phases.push({ sides: sides, turns: [0, 1, 3], kind: 'A', name: nm + ' · چپ و راست' });
+        else if (prot) {
+          n.phases.push({ sides: sides, turns: [0, 1], kind: 'T', name: nm + ' · مستقیم و راست' });
+          if (hasLeft) n.phases.push({ sides: sides, turns: [3], kind: 'L', name: nm + ' · فقط چپ' });
+        } else n.phases.push({ sides: sides, turns: [0, 1, 3], kind: 'A', name: nm });
+      });
+      n.phases.forEach(function (ph, pi) { if (ph.kind !== 'L') ph.sides.forEach(function (s) { n.phaseOf[s] = pi; }); });
+      n.phaseFor = function (side, turn) {
+        for (var i = 0; i < n.phases.length; i++) { var ph = n.phases[i]; if (ph.sides.indexOf(side) >= 0 && ph.turns.indexOf(turn) >= 0) return i; }
+        return n.phaseOf[side];
+      };
+    });
+    return { key: key, nodes: nodes, links: links, conns: conns, entries: entries, lanes: NL, protected: !!prot };
+  }
+
+  /* ---------- demand (shared) ---------- */
+  function Demand(net, seed) {
+    this.rate = 800; this.surge = null; this.vid = 1; this.evRng = mulberry32(seed * 31 + 5);
+    this.entries = net.entries.map(function (e, i) {
+      return { idx: i, weight: e.weight, rng: mulberry32(seed * 977 + i * 131 + 7), next: 0 };
+    });
+    var self = this;
+    this.entries.forEach(function (e) { e.next = self.draw(e, 0); });
+  }
+  Demand.prototype.rateOf = function (e, t) {
+    var r = this.rate * e.weight;
+    if (this.surge && this.surge.entry === e.idx && t < this.surge.until) r *= 2.6;
+    return r;
+  };
+  Demand.prototype.draw = function (e, t) {
+    var lam = Math.max(this.rateOf(e, t), 5) / 3600;
+    return t + (-Math.log(1 - e.rng()) / lam);
+  };
+  Demand.prototype.setRate = function (r, t) {
+    this.rate = r; var self = this;
+    this.entries.forEach(function (e) { e.next = self.draw(e, t); });
+  };
+  Demand.prototype.makeSpec = function (rng, entry, kind) {
+    var u = rng();
+    var k = kind || (u < 0.13 ? 'moto' : 'car');
+    var turns = [];
+    for (var i = 0; i < 8; i++) { var q = rng(); turns.push(q < 0.64 ? 0 : (q < 0.84 ? 1 : 3)); }
+    var gps = rng() < 0.6;
+    return { id: this.vid++, kind: k, len: LEN[k], turns: turns, gps: gps, entry: entry };
+  };
+  Demand.prototype.step = function (t, dt) {
+    var out = [], self = this;
+    this.entries.forEach(function (e) {
+      var guard = 0;
+      while (e.next <= t && guard++ < 20) {
+        out.push(self.makeSpec(e.rng, e.idx, null));
+        e.next = self.draw(e, e.next);
+      }
+    });
+    return out;
+  };
+  Demand.prototype.makeEV = function (kind, entryIdx) {
+    var idx = entryIdx == null ? Math.floor(this.evRng() * this.entries.length) : entryIdx;
+    var s = this.makeSpec(this.evRng, idx, kind);
+    s.gps = this.evRng() < 0.6;
+    return s;
+  };
+  Demand.prototype.triggerSurge = function (t) {
+    var idx = Math.floor(this.evRng() * this.entries.length);
+    this.surge = { entry: idx, until: t + 90 };
+    var e = this.entries[idx]; e.next = this.draw(e, t);
+    return idx;
+  };
+
+  /* ---------- vehicle ---------- */
+  function Veh(spec, t) {
+    this.id = spec.id; this.spec = spec; this.kind = spec.kind; this.len = spec.len;
+    this.isEV = EVRANK[spec.kind] !== undefined; this.vf = VF[spec.kind]; this.acc = ACC[spec.kind];
+    this.link = null; this.s = 0; this.v = 0; this.hop = 0; this.nextConn = null;
+    this.t0 = t; this.stopped = 0; this.stops = 0; this.wasStopped = false; this.curWait = 0;
+    this.redWait = 0; this.risky = false; this.riskCounted = false; this.vcap = null;
+    this.latOff = 0; this.visT = 0; this.audT = 0; this.detected = null; this.spawned = false;
+  }
+
+  /* ---------- simulator ---------- */
+  function Sim(key, mode, opts) {
+    this.key = key; this.mode = mode; this.net = buildNetwork(key, opts.leftMode === 'protected');
+    this.opts = opts;
+    this.t = 0; this.acc1 = 0;
+    this.rng = mulberry32(4242 + (mode === 'smart' ? 17 : 0));
+    var NL = this.net.lanes; this.pending = this.net.entries.map(function () { var a = []; for (var i = 0; i < NL; i++) a.push([]); return a; });
+    this.vehs = [];
+    this.stats = { n: 0, sumStop: 0, sumTravel: 0, sumStops: 0, redRuns: 0, rejected: 0, risky: 0, ev: [], recent: [], preempts: 0 };
+    this.log = []; this.evLog = []; this.lastLogAt = {};
+    var self = this;
+    this.net.nodes.forEach(function (n) {
+      var off = (n.id * 11) % 25;
+      n.sig = { phase: (n.id % 2) % n.phases.length, state: 'G', t: 0, greenElapsed: off, target: null, hold: false, holdT: 0 };
+      n.pv = [null, null, null, null]; n.conf = 1; n.confBad = 0; n.confOk = 0; n.fallback = false;
+      n.pre = null; n.preRel = 0; n.lastPressure = [0, 0];
+    });
+  }
+
+  Sim.prototype.resetStats = function () {
+    this.stats = { n: 0, sumStop: 0, sumTravel: 0, sumStops: 0, redRuns: 0, rejected: 0, risky: 0, ev: [], recent: [], preempts: 0 };
+    this.log = []; this.evLog = [];
+    this.vehs.forEach(function (v) { v.stopped = 0; v.stops = 0; });
+    this.pending.forEach(function (p) { p.forEach(function (q) { q.forEach(function (v) { v.stopped = 0; }); }); });
+  };
+
+  Sim.prototype.say = function (text, kind, key, gap) {
+    if (key) { var last = this.lastLogAt[key]; if (last != null && this.t - last < (gap || 8)) return; this.lastLogAt[key] = this.t; }
+    this.log.unshift({ t: this.t, text: text, kind: kind || 'info' });
+    if (this.log.length > 80) this.log.pop();
+  };
+  Sim.prototype.evSay = function (text, kind) {
+    this.evLog.unshift({ t: this.t, text: text, kind: kind || 'info' });
+    if (this.evLog.length > 60) this.evLog.pop();
+  };
+
+  Sim.prototype.light = function (node, side, turn) {
+    var sg = node.sig;
+    if (sg.state === 'AR') return 'R';
+    var ph = node.phases[sg.phase];
+    if (ph.sides.indexOf(side) >= 0 && ph.turns.indexOf(turn || 0) >= 0) return sg.state === 'Y' ? 'Y' : 'G';
+    return 'R';
+  };
+  // seconds until the (side, turn) movement shows green under the fixed-time plan (the Iran-style countdown)
+  Sim.prototype.countdown = function (node, side, turn) {
+    var sg = node.sig, np = node.phases.length, o = this.opts;
+    var dur = function (i) { return node.phases[i].kind === 'L' ? o.leftFixed : o.greenFixed; };
+    var tgt = node.phaseFor(side, turn);
+    if (sg.phase === tgt && sg.state === 'G') return Math.max(0, dur(tgt) - sg.greenElapsed);
+    var t = 0, nxt;
+    if (sg.state === 'G') { t += Math.max(0, dur(sg.phase) - sg.greenElapsed) + YELLOW + ALLRED; nxt = (sg.phase + 1) % np; }
+    else if (sg.state === 'Y') { t += (YELLOW - sg.t) + ALLRED; nxt = sg.target != null ? sg.target : (sg.phase + 1) % np; }
+    else { t += Math.max(0, ALLRED - sg.t); nxt = sg.target != null ? sg.target : (sg.phase + 1) % np; }
+    var guard = 0;
+    while (nxt !== tgt && guard++ < 8) { t += dur(nxt) + YELLOW + ALLRED; nxt = (nxt + 1) % np; }
+    return t;
+  };
+
+  /* --- safety kernel: the ONLY door to the signal --- */
+  Sim.prototype.request = function (node, target, reason, emerg, force) {
+    var sg = node.sig;
+    if (sg.state !== 'G') {
+      if (emerg && sg.target !== target) { sg.target = target; }
+      return false;
+    }
+    if (target === sg.phase) return false;
+    var minG = force ? 0 : (emerg ? MIN_GREEN_EV : (node.phases[sg.phase].kind === 'L' ? TUNE.minL : TUNE.minT));
+    if (sg.greenElapsed < minG) {
+      if (this.t - (this.lastLogAt['rejc' + node.id] || -99) > 6) { this.stats.rejected++; this.lastLogAt['rejc' + node.id] = this.t; }
+      this.say('هسته‌ی ایمنی درخواست تغییر فاز را رد کرد (چهارراه ' + (node.id + 1) + '): حداقل سبز هنوز تمام نشده', 'kernel', 'rej' + node.id, 12);
+      return false;
+    }
+    sg.state = 'Y'; sg.t = 0; sg.target = target; sg.hold = false;
+    return true;
+  };
+  Sim.prototype.advanceSignal = function (node, dt) {
+    var sg = node.sig; sg.t += dt;
+    if (sg.state === 'G') sg.greenElapsed += dt;
+    else if (sg.state === 'Y' && sg.t >= YELLOW) { sg.state = 'AR'; sg.t = 0; }
+    else if (sg.state === 'AR' && (sg.t >= ALLRED || (this.mode === 'smart' && TUNE.dynAR && sg.t >= 1.0 && node.connList.every(function (c) { return !c.vehicles.length; })))) {
+      sg.state = 'G'; sg.phase = sg.target != null ? sg.target : (sg.phase + 1) % node.phases.length;
+      sg.target = null; sg.t = 0; sg.greenElapsed = 0; sg.holdT = 0;
+    }
+  };
+
+  /* --- controllers (decide once per second) --- */
+  Sim.prototype.fixedCtl = function (node, green, leftG) {
+    var sg = node.sig; if (sg.state !== 'G') return;
+    var dur = node.phases[sg.phase].kind === 'L' ? leftG : green;
+    if (sg.greenElapsed >= dur) this.request(node, (sg.phase + 1) % node.phases.length, 'fixed', false, true);
+  };
+
+  Sim.prototype.perceive = function (node) {
+    var health = this.opts.fault ? 0.12 : 0.96, self = this;
+    node.conf = this.opts.fault ? 0.1 + 0.1 * this.rng() : 0.93 + 0.06 * this.rng();
+    for (var s = 0; s < 4; s++) {
+      var Ls = node.inL[s]; if (!Ls) { node.pv[s] = null; continue; }
+      var q = 0, far = 0, moving = 0, stoppedN = 0, maxWait = 0, near = 0, g = { L: { q: 0, near: 0, w: 0 }, T: { q: 0, near: 0, w: 0 } };
+      Ls.forEach(function (L) { var grp = (node.protected && L.lane === 0) ? g.L : g.T; L.vehicles.forEach(function (v) {
+        if (v.curWait > maxWait) maxWait = v.curWait;
+        if (v.curWait > grp.w) grp.w = v.curWait;
+        if (self.rng() > health) return;
+        var d = L.len - v.s, add = 0;
+        if (d <= 130) { if (d <= 60) { near++; grp.near++; } if (v.v < 1.0) { add = 1; stoppedN++; } else { add = 0.6; moving++; } q += add; grp.q += add; }
+        else if (self.opts.coopt && L.kind === 'internal') { far += 0.3; g.T.q += 0.3; }
+      }); });
+      var pen = 0;
+      var through = node.outL[opp(s)];
+      if (through && through[0].kind === 'internal') {
+        var cnt = 0; through.forEach(function (T) { cnt += T.vehicles.length; });
+        var load = cnt / (through.length * through[0].len / 7.6);
+        pen = 6 * Math.max(0, load - 0.7);
+      }
+      node.pv[s] = { q: q, far: far, moving: moving, stopped: stoppedN, pressure: q + far - pen + maxWait / TUNE.waitDiv, near: near, maxWait: maxWait, pen: pen,
+        pL: g.L.q + g.L.w / TUNE.waitDiv, pT: g.T.q - pen + g.T.w / TUNE.waitDiv, nearL: g.L.near, nearT: g.T.near, wL: g.L.w, wT: g.T.w };
+    }
+  };
+
+  Sim.prototype.phasePressure = function (node, p) {
+    var ph = node.phases[p], tot = 0; ph.sides.forEach(function (s) { var v = node.pv[s]; if (v) tot += ph.kind === 'L' ? v.pL : (ph.kind === 'T' ? v.pT : v.pressure); }); return tot;
+  };
+  Sim.prototype.phaseNear = function (node, p) {
+    var ph = node.phases[p], t = 0; ph.sides.forEach(function (s) { var v = node.pv[s]; if (v) t += ph.kind === 'L' ? v.nearL : (ph.kind === 'T' ? v.nearT : v.near); }); return t;
+  };
+  Sim.prototype.phaseWait = function (node, p) {
+    var ph = node.phases[p], m = 0; ph.sides.forEach(function (s) { var v = node.pv[s]; if (!v) return; var w = ph.kind === 'L' ? v.wL : (ph.kind === 'T' ? v.wT : v.maxWait); if (w > m) m = w; }); return m;
+  };
+
+  Sim.prototype.watchdog = function (node) {
+    if (node.conf < 0.5) { node.confBad++; node.confOk = 0; } else { node.confOk++; node.confBad = 0; }
+    if (!node.fallback && node.confBad >= 3) {
+      node.fallback = true;
+      this.say('ناظر: اطمینان حسگر پایین است (چهارراه ' + (node.id + 1) + ') ← برگشت به برنامه‌ی ثابت فعلی', 'watchdog');
+    } else if (node.fallback && node.confOk >= 10) {
+      node.fallback = false;
+      this.say('ناظر: حسگر سالم شد (چهارراه ' + (node.id + 1) + ') ← کنترل تطبیقی دوباره فعال شد', 'watchdog');
+    }
+  };
+
+  Sim.prototype.evModule = function (node) {
+    var self = this, best = null;
+    // gather requests from vehicles on inbound links of this node
+    for (var s = 0; s < 4; s++) {
+      var Ls2 = node.inL[s]; if (!Ls2) continue;
+      Ls2.forEach(function (L) { L.vehicles.forEach(function (v) {
+        if (!v.isEV) return;
+        var d = L.len - v.s;
+        if (!v.detected) {
+          if (v.spec.gps && d <= GPS_RANGE) {
+            v.detected = 'gps';
+            self.evSay('اولویت اورژانس: ' + KIND_FA[v.kind] + ' از ورودی ' + SIDE_FA[s] + ' با GPS امضاشده شناسایی شد (' + Math.round(d) + ' متر تا چراغ)', 'ev');
+          } else if (d <= VIS_RANGE) {
+            if (self.rng() < (self.opts.fault ? 0.1 : 0.7)) v.visT += 1;
+            if (self.rng() < 0.8) v.audT += 1;
+            if (v.visT >= 1 && v.audT >= 1) {
+              v.detected = 'va';
+              self.evSay('اولویت اورژانس: ' + KIND_FA[v.kind] + ' از ورودی ' + SIDE_FA[s] + ' با دید + صدا تأیید شد (گیت AND، ' + Math.round(d) + ' متر)', 'ev');
+            }
+          }
+        }
+        if (v.detected) {
+          var cand = { v: v, side: s, rank: EVRANK[v.kind], d: d };
+          if (!best || cand.rank > best.rank || (cand.rank === best.rank && cand.d < best.d)) best = cand;
+        }
+      }); });
+    }
+    var sg = node.sig;
+    if (best) {
+      if (!node.pre || node.pre.v !== best.v) {
+        node.pre = { v: best.v, side: best.side, since: this.t, turn: best.v.nextConn ? best.v.nextConn.turn : 0 };
+        this.stats.preempts++;
+        this.evSay('هسته‌ی ایمنی: پیش‌دستی چراغ چهارراه ' + (node.id + 1) + ' برای ' + KIND_FA[best.v.kind] + ' (ورودی ' + SIDE_FA[best.side] + ')، دنباله‌ی امن: زرد ← تمام‌قرمز ← سبز', 'kernel');
+      }
+      node.preRel = 0;
+    } else if (node.pre) {
+      node.preRel += 1;
+      if (node.preRel >= 3) {
+        node.pre = null; sg.hold = false;
+        this.evSay('پیش‌دستی چهارراه ' + (node.id + 1) + ' تمام شد ← بازگشت به کنترل عادی', 'info');
+      }
+    }
+    if (node.pre) {
+      var p = node.phaseFor(node.pre.side, node.pre.turn);
+      if (sg.state === 'G' && sg.phase === p) {
+        sg.hold = true; sg.holdT += 1;
+        if (sg.holdT > EV_HOLD_MAX) { sg.hold = false; node.pre = null; }
+      } else if (sg.state === 'G') {
+        this.request(node, p, 'emergency', true, false);
+      } else if (sg.target !== p) {
+        sg.target = p;
+      }
+      return true;
+    }
+    return false;
+  };
+
+  Sim.prototype.smartCtl = function (node) {
+    this.perceive(node); this.watchdog(node);
+    var sg = node.sig;
+    if (this.opts.evModule && this.evModule(node)) { if (sg.hold) return; return; }
+    else sg.hold = false;
+    if (sg.state !== 'G') return;
+    if (node.fallback) { this.fixedCtl(node, 30, 10); return; }
+    var np = node.phases.length, cur = sg.phase, P = [], Wt = [], p;
+    for (p = 0; p < np; p++) { P[p] = this.phasePressure(node, p); Wt[p] = this.phaseWait(node, p); }
+    var Pc = P[cur], best = -1, bp = -1e9, wi = -1, wv = 0;
+    for (p = 0; p < np; p++) { if (p === cur) continue; if (P[p] > bp) { bp = P[p]; best = p; } if (Wt[p] > wv) { wv = Wt[p]; wi = p; } }
+    if (best < 0) return;
+    node.lastPressure = [Pc, bp];
+    var cph = node.phases[cur], maxG = cph.kind === 'L' ? TUNE.maxL : TUNE.maxT, why = '', target = best;
+    if (this.phaseNear(node, cur) === 0) sg.gapT = (sg.gapT || 0) + 1; else sg.gapT = 0;
+    if (sg.gapT >= TUNE.gap && bp > (node.phases[best].kind === 'L' ? TUNE.leftThr : 0.8)) why = 'صف این فاز خالی شد (gap-out)';
+    else if (bp > TUNE.ratio * Pc + TUNE.off && (node.phases[best].kind !== 'L' || bp > TUNE.leftThr)) why = 'فشار ترافیک فاز بعدی بیشتر است';
+    else if (sg.greenElapsed >= maxG && bp > 0.5) why = 'سقف سبز رسید';
+    else if (wv >= MAX_WAIT && sg.greenElapsed >= (cph.kind === 'L' ? 12 : 30)) { why = 'سقف انتظار یک ورودی رسید (ضد گرسنگی)'; target = wi; }
+    if (why) {
+      var ok = this.request(node, target, 'decider', false, false);
+      if (ok) this.say('چهارراه ' + (node.id + 1) + ': رفتن به «' + node.phases[target].name + '» — ' + why + ' (فشار ' + Pc.toFixed(1) + ' ← ' + P[target].toFixed(1) + ')', 'decide', null);
+    } else if (this.t - (this.lastLogAt['hold' + node.id] || -99) > 15 && Pc > 3) {
+      this.lastLogAt['hold' + node.id] = this.t;
+      this.say('چهارراه ' + (node.id + 1) + ': «' + cph.name + '» ادامه می‌یابد — فشار ' + Pc.toFixed(1) + ' در برابر ' + bp.toFixed(1), 'decide');
+    }
+  };
+
+  /* --- vehicle physics --- */
+  Sim.prototype.sameLinkLeader = function (veh) {
+    var L = veh.link, best = null, bestGap = Infinity, crawl = false;
+    for (var i = 0; i < L.vehicles.length; i++) {
+      var o = L.vehicles[i]; if (o === veh) continue;
+      var ahead = o.s > veh.s || (o.s === veh.s && o.id < veh.id);
+      if (!ahead) continue;
+      var g = (o.s - o.len) - veh.s;
+      if (veh.isEV && !o.isEV) { if (g < 12 && o.v < 4) crawl = true; continue; }
+      if (g < bestGap) { bestGap = g; best = o; }
+    }
+    return { lead: best, gap: bestGap, crawl: crawl };
+  };
+
+  Sim.prototype.lookAhead = function (veh) {
+    var L = veh.link, c = veh.nextConn, gap = Infinity, v = 0;
+    var base = L.len - veh.s;
+    var consider = function (arr, off) {
+      for (var i = 0; i < arr.length; i++) {
+        var o = arr[i]; if (veh.isEV && !o.isEV) continue;
+        var g = off + (o.s - o.len);
+        if (g < gap) { gap = g; v = o.v; }
+      }
+    };
+    if (c) { consider(c.vehicles, base); consider(c.outLink.vehicles, base + c.len); }
+    return { gap: gap, v: v };
+  };
+
+  Sim.prototype.exitFree = function (c, veh) {
+    var arr = c.outLink.vehicles, need = veh.len + 2.5, i;
+    for (i = 0; i < arr.length; i++) if ((arr[i].s - arr[i].len) < need) return false;
+    for (i = 0; i < c.vehicles.length; i++) if ((c.vehicles[i].s - c.vehicles[i].len) < veh.len + 1.0) return false;
+    return true;
+  };
+  Sim.prototype.connFree = function (c, veh, strict) {
+    var node = c.node, i, j;
+    for (i = 0; i < c.conflicts.length; i++) if (c.conflicts[i].vehicles.length) return false;
+    if (c.turn === 3) {
+      var Los = node.inL[opp(c.a)];
+      if (Los && this.light(node, opp(c.a), 0) !== 'R') {
+        for (var lq = 0; lq < Los.length; lq++) { var Lo = Los[lq];
+          for (j = 0; j < Lo.vehicles.length; j++) {
+            var o = Lo.vehicles[j];
+            if (o.nextConn && o.nextConn.turn === 0) {
+              var d = Lo.len - o.s, tt = d / Math.max(o.v, 2);
+              if (d < 50 && tt < 3.2) return false;
+            }
+          }
+        }
+      }
+    }
+    if (strict) {
+      for (i = 0; i < c.conflicts.length; i++) {
+        var Li = c.conflicts[i].inLink; if (!Li) continue;
+        for (j = 0; j < Li.vehicles.length; j++) {
+          var w = Li.vehicles[j];
+          if (Li.len - w.s < 35 && w.v > 2) return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  Sim.prototype.canCross = function (veh) {
+    var L = veh.link, node = L.toNode, a = L.toSide, c = veh.nextConn;
+    var sig = this.light(node, a, c.turn), dist = L.len - veh.s, ok = false;
+    if (sig === 'G') ok = true;
+    else if (sig === 'Y') { var stopD = veh.v * veh.v / (2 * 4.5) + veh.v * 0.3; ok = dist < stopD && veh.v > 1; }
+    var redRun = false;
+    if (!ok && veh.isEV && this.mode === 'fixed' && this.opts.riskRed && veh.redWait >= 5 &&
+        this.connFree(c, veh, true) && this.exitFree(c, veh)) { ok = true; redRun = true; }
+    if (!ok) return false;
+    var chk = dist < Math.max(10, veh.v * veh.v / 8 + 6);
+    if (chk && !(this.connFree(c, veh, false) && this.exitFree(c, veh))) return false;
+    if (redRun && dist < 3) { veh.risky = true; }
+    return true;
+  };
+
+  Sim.prototype.pickConn = function (veh, link) {
+    var node = link.toNode, a = link.toSide, ln = link.lane, want = veh.spec.turns[Math.min(veh.hop, 7)];
+    var order = [want, 0, 1, 3], i;
+    for (i = 0; i < order.length; i++) {
+      var h = opp(a), b = (h + order[i]) % 4;
+      if (node.sides[b] && b !== a && node.conn[a][ln][b]) return node.conn[a][ln][b];
+    }
+    for (var b2 = 0; b2 < 4; b2++) if (node.conn[a][ln][b2]) return node.conn[a][ln][b2];
+    return null;
+  };
+
+  Sim.prototype.chooseLane = function (node, a, want, loadFn) {
+    var order = [want, 0, 1, 3], h = opp(a), nl = node.inL[a].length;
+    for (var i = 0; i < order.length; i++) {
+      var b = (h + order[i]) % 4; if (!node.sides[b] || b === a) continue;
+      var best = -1, bl = 1e9;
+      for (var ln = 0; ln < nl; ln++) { if (!node.conn[a][ln][b]) continue; var l = loadFn(ln); if (l < bl) { bl = l; best = ln; } }
+      if (best >= 0) return { lane: best, conn: node.conn[a][best][b] };
+    }
+    return null;
+  };
+  Sim.prototype.place = function (veh, link, s) {
+    if (veh.link) { var ix = veh.link.vehicles.indexOf(veh); if (ix >= 0) veh.link.vehicles.splice(ix, 1); }
+    var conn = null;
+    if (link.kind === 'internal') {
+      var node = link.toNode, a = link.toSide, want = veh.spec.turns[Math.min(veh.hop, 7)], cur = link.lane;
+      var ch = this.chooseLane(node, a, want, function (ln) {
+        var Lk = node.inL[a][ln], c = Lk.vehicles.length;
+        for (var k = 0; k < Lk.vehicles.length; k++) if (Lk.vehicles[k].s - Lk.vehicles[k].len < s + veh.len + 1.5) { c += 6; break; }
+        return c + (ln === cur ? -0.4 : 0);
+      });
+      if (ch) { var tl = node.inL[a][ch.lane]; if (tl !== link) { veh.latOff = (link.lane - tl.lane) * LW; link = tl; } conn = ch.conn; }
+    }
+    veh.link = link; veh.s = s; link.vehicles.push(veh);
+    if (link.kind === 'entry') veh.nextConn = this.pickConn(veh, link);
+    else if (link.kind === 'internal') veh.nextConn = conn || this.pickConn(veh, link);
+    else veh.nextConn = null;
+  };
+
+  Sim.prototype.moveVeh = function (veh, dt) {
+    var L = veh.link, isConn = L.kind === 'conn', node = L.toNode;
+    var vdes = L.vlim * veh.vf; if (veh.vcap) vdes = Math.min(vdes, veh.vcap);
+    var gap = Infinity, vl = 0, leadObj = null;
+    var sl = this.sameLinkLeader(veh);
+    if (sl.lead) { gap = sl.gap; vl = sl.lead.v; leadObj = sl.lead; }
+    if (sl.crawl) vdes = Math.min(vdes, CRAWL);
+    var sig = null, permit = true;
+    if (!isConn && node) {
+      sig = this.light(node, L.toSide, veh.nextConn ? veh.nextConn.turn : 0);
+      if (veh.isEV && veh.v < 0.6 && L.len - veh.s < 3.5 && sig !== 'G') veh.redWait += dt;
+      else if (sig === 'G') veh.redWait = 0;
+      permit = veh.nextConn ? this.canCross(veh) : false;
+      if (!permit) { var g2 = (L.len - veh.s) - 0.6; if (g2 < gap) { gap = g2; vl = 0; leadObj = null; } }
+      else { var la = this.lookAhead(veh); if (la.gap < gap) { gap = la.gap; vl = la.v; leadObj = null; } }
+      if (veh.risky) vdes = Math.min(vdes, 4);
+    } else if (isConn) {
+      var oL = L.outLink, base = L.len - veh.s;
+      for (var i = 0; i < oL.vehicles.length; i++) {
+        var o = oL.vehicles[i]; if (veh.isEV && !o.isEV) continue;
+        var g = base + (o.s - o.len); if (g < gap) { gap = g; vl = o.v; leadObj = null; }
+      }
+    }
+    var vs = Infinity;
+    if (gap < Infinity) { var gg = Math.max(0, gap - MINGAP); vs = -B * TAU + Math.sqrt(B * B * TAU * TAU + vl * vl + 2 * B * gg); }
+    var vnew = Math.min(veh.v + veh.acc * dt, vdes, vs);
+    vnew = Math.max(vnew, Math.max(0, veh.v - 9 * dt));
+    var ds = (veh.v + vnew) / 2 * dt, ns = veh.s + ds;
+    if (leadObj) { var lim = (leadObj.s - leadObj.len) - 0.3; if (ns > lim) { ns = Math.max(veh.s, lim); } }
+    veh.v = vnew;
+    if (veh.latOff) { var dl = 3 * dt; veh.latOff = Math.abs(veh.latOff) <= dl ? 0 : veh.latOff - Math.sign(veh.latOff) * dl; }
+    // stopped-time accounting
+    var stoppedNow = vnew < 0.5 && !isConn;
+    if (stoppedNow) { veh.stopped += dt; veh.curWait += dt; if (!veh.wasStopped) { veh.stops++; veh.wasStopped = true; } }
+    else { if (vnew > 2) { veh.curWait = 0; veh.wasStopped = false; } }
+    // transitions
+    if (L.kind === 'exit') {
+      veh.s = ns;
+      if (veh.s >= L.len) this.finish(veh);
+      return;
+    }
+    if (isConn) {
+      veh.s = ns;
+      if (veh.s >= L.len) {
+        var over = veh.s - L.len; veh.hop++; this.place(veh, L.outLink, over);
+      }
+      return;
+    }
+    // inbound link
+    if (ns >= L.len) {
+      if (permit && veh.nextConn && this.canCrossNow(veh)) {
+        var c = veh.nextConn;
+        if (this.light(node, L.toSide, c.turn) === 'R') this.stats.redRuns += veh.risky ? 0 : 1;
+        if (veh.risky && !veh.riskCounted) { veh.riskCounted = true; this.stats.risky++; this.evSay('خطر: ' + KIND_FA[veh.kind] + ' در وضع فعلی چراغ قرمز را با احتیاط رد کرد', 'risk'); }
+        var over2 = ns - L.len; this.place(veh, c, over2);
+      } else { veh.s = L.len - 0.01; veh.v = 0; }
+    } else veh.s = ns;
+  };
+  Sim.prototype.canCrossNow = function (veh) {
+    var c = veh.nextConn; var L = veh.link, sig = this.light(L.toNode, L.toSide, c.turn);
+    if (sig === 'R' && !veh.risky) { if (!(veh.isEV && this.mode === 'fixed' && this.opts.riskRed && veh.redWait >= 5)) return false; }
+    return this.connFree(c, veh, veh.risky) && this.exitFree(c, veh);
+  };
+
+  Sim.prototype.finish = function (veh) {
+    var ix = veh.link.vehicles.indexOf(veh); if (ix >= 0) veh.link.vehicles.splice(ix, 1);
+    var jx = this.vehs.indexOf(veh); if (jx >= 0) this.vehs.splice(jx, 1);
+    var tt = this.t - veh.t0;
+    this.stats.n++; this.stats.sumStop += veh.stopped; this.stats.sumTravel += tt; this.stats.sumStops += veh.stops;
+    this.stats.recent.push({ t: this.t, stop: veh.stopped });
+    if (veh.isEV) this.stats.ev.push({ kind: veh.kind, time: tt, stopped: veh.stopped, risky: veh.risky, id: veh.id });
+  };
+
+  Sim.prototype.inject = function (spec) {
+    var v = new Veh(spec, this.t), A = this.net.entries[spec.entry], pq = this.pending[spec.entry], t0 = spec.turns[0];
+    var ch = this.chooseLane(A.toNode, A.toSide, t0, function (l) { return A.lanes[l].vehicles.length + pq[l].length + l * 0.01; });
+    var lane = ch ? ch.lane : 0;
+    v.lane = lane; pq[lane].push(v);
+  };
+
+  Sim.prototype.step = function (dt, specs) {
+    var self = this;
+    this.t += dt;
+    for (var i = 0; i < specs.length; i++) this.inject(specs[i]);
+    // spawn
+    this.net.entries.forEach(function (A, ei) { for (var ln = 0; ln < A.lanes.length; ln++) {
+      var E = A.lanes[ln], q = self.pending[ei][ln];
+      q.forEach(function (v) { v.stopped += dt; });
+      while (q.length) {
+        var v = q[0], free = true;
+        for (var k = 0; k < E.vehicles.length; k++) if ((E.vehicles[k].s - E.vehicles[k].len) < v.len + MINGAP + 2.5) { free = false; break; }
+        if (!free) break;
+        q.shift(); v.v = Math.min(E.vlim * v.vf, 10); v.spawned = true;
+        self.vehs.push(v); self.place(v, E, 0);
+      }
+    } });
+    // controllers (1 Hz)
+    this.acc1 += dt;
+    if (this.acc1 >= 1) {
+      this.acc1 -= 1;
+      this.net.nodes.forEach(function (n) {
+        if (self.mode === 'fixed') self.fixedCtl(n, self.opts.greenFixed, self.opts.leftFixed);
+        else self.smartCtl(n);
+      });
+    }
+    this.net.nodes.forEach(function (n) { self.advanceSignal(n, dt); });
+    // move vehicles: per link, front to back
+    var all = this.net.links.concat(this.net.conns);
+    all.forEach(function (L) {
+      if (!L.vehicles.length) return;
+      var arr = L.vehicles.slice().sort(function (a, b) { return b.s - a.s || a.id - b.id; });
+      for (var i = 0; i < arr.length; i++) if (arr[i].link === L) self.moveVeh(arr[i], dt);
+    });
+    // trim recent window
+    var rc = this.stats.recent; while (rc.length && rc[0].t < this.t - 300) rc.shift();
+  };
+
+  /* ---------- metrics & geometry helpers for the UI ---------- */
+  Sim.prototype.metrics = function () {
+    var q = 0, vs = 0, nv = 0, maxW = 0, i;
+    for (i = 0; i < this.vehs.length; i++) {
+      var v = this.vehs[i];
+      if (v.link.kind !== 'conn') { nv++; vs += v.v; if (v.v < 0.5) q++; }
+      if (v.curWait > maxW) maxW = v.curWait;
+    }
+    var pend = 0; this.pending.forEach(function (p) { p.forEach(function (q) { pend += q.length; }); });
+    var rc = this.stats.recent, sum = 0, cnt = 0, thr = 0;
+    for (i = 0; i < rc.length; i++) { if (rc[i].t >= this.t - 120) { sum += rc[i].stop; cnt++; } }
+    thr = rc.length;
+    var evs = this.stats.ev, evAvg = null;
+    if (evs.length) { evAvg = evs.reduce(function (a, e) { return a + e.time; }, 0) / evs.length; }
+    // stricter delay: also counts the waiting time of vehicles that have not finished yet (no survivor bias in overload)
+    var allSum = this.stats.sumStop, allN = this.stats.n + pend;
+    for (i = 0; i < this.vehs.length; i++) { allSum += this.vehs[i].stopped; allN++; }
+    this.pending.forEach(function (p) { p.forEach(function (q) { q.forEach(function (v) { allSum += v.stopped; }); }); });
+    return {
+      avgStopAll: allN ? allSum / allN : 0,
+      avgStop: this.stats.n ? this.stats.sumStop / this.stats.n : 0,
+      recentStop: cnt ? sum / cnt : 0,
+      queue: q + pend, inNet: this.vehs.length, pending: pend,
+      thr5: thr, maxWait: maxW, avgKmh: nv ? (vs / nv) * 3.6 : 0,
+      done: this.stats.n, evAvg: evAvg, evN: evs.length, risky: this.stats.risky,
+      rejected: this.stats.rejected, preempts: this.stats.preempts, stops: this.stats.n ? this.stats.sumStops / this.stats.n : 0
+    };
+  };
+
+  Sim.prototype.pose = function (veh) {
+    var L = veh.link, x, y, ang;
+    if (L.kind === 'conn') {
+      var s = Math.min(Math.max(veh.s, 0), L.len), i = 1;
+      while (i < L.cum.length - 1 && L.cum[i] < s) i++;
+      var s0 = L.cum[i - 1], s1 = L.cum[i], f = s1 > s0 ? (s - s0) / (s1 - s0) : 0;
+      var p0 = L.pts[i - 1], p1 = L.pts[i];
+      x = p0.x + (p1.x - p0.x) * f; y = p0.y + (p1.y - p0.y) * f; ang = Math.atan2(p1.y - p0.y, p1.x - p0.x);
+    } else {
+      x = L.ax + L.dx * veh.s; y = L.ay + L.dy * veh.s; ang = Math.atan2(L.dy, L.dx);
+    }
+    if (veh.latOff && L.kind !== 'conn') { x += -Math.sin(ang) * -veh.latOff; y += Math.cos(ang) * -veh.latOff; }
+    if (veh.isEV) { x += Math.sin(ang) * 1.3; y -= Math.cos(ang) * 1.3; }
+    return { x: x, y: y, ang: ang };
+  };
+
+  /* ---------- world: two sims, one demand ---------- */
+  function World(key, opts, seed) {
+    this.key = key; this.seed = seed || 1;
+    this.opts = Object.assign({ leftMode: 'protected', leftFixed: 12, greenFixed: 35, riskRed: true, evModule: true, coopt: true, fault: false }, opts || {});
+    this.base = new Sim(key, 'fixed', this.opts);
+    this.smart = new Sim(key, 'smart', this.opts);
+    this.demand = new Demand(this.base.net, this.seed);
+    this.t = 0; this.extra = [];
+    this.hist = [];
+    this.lastHist = 0;
+  }
+  World.prototype.step = function (dt) {
+    this.t += dt;
+    var specs = this.demand.step(this.t, dt);
+    if (this.extra.length) { specs = specs.concat(this.extra); this.extra = []; }
+    this.base.step(dt, specs); this.smart.step(dt, specs);
+    if (this.t - this.lastHist >= 5) {
+      this.lastHist = this.t;
+      var a = this.base.metrics(), b = this.smart.metrics();
+      this.hist.push({ t: this.t, a: a.recentStop, b: b.recentStop, qa: a.queue, qb: b.queue });
+      if (this.hist.length > 240) this.hist.shift();
+    }
+  };
+  World.prototype.resetStats = function () { this.base.resetStats(); this.smart.resetStats(); this.hist = []; this.lastHist = this.t; };
+  World.prototype.addEV = function (kind) {
+    var spec = this.demand.makeEV(kind, null);
+    this.extra.push(spec);
+    var E = this.base.net.entries[spec.entry];
+    return { spec: spec, label: E.label };
+  };
+  World.prototype.setRate = function (r) { this.demand.setRate(r, this.t); };
+  World.prototype.surge = function () {
+    var idx = this.demand.triggerSurge(this.t);
+    return this.base.net.entries[idx].label;
+  };
+
+  return {
+    TUNE: TUNE, SCENARIOS: SCENARIOS, World: World, Sim: Sim, Demand: Demand, buildNetwork: buildNetwork,
+    KIND_FA: KIND_FA, SIDE_FA: SIDE_FA, EVRANK: EVRANK,
+    consts: { R: R, LW: LW, SPACING: SPACING, ENTRY: ENTRY, YELLOW: YELLOW, ALLRED: ALLRED, MIN_GREEN: MIN_GREEN, MAX_GREEN: MAX_GREEN }
+  };
+});
+
+</script>
+<script>
+(function(){
+'use strict';
+var T = TrafficLab, KIND = T.KIND_FA;
+var $ = function(id){return document.getElementById(id)};
+var fa = function(n,d){ if(n==null||!isFinite(n)) return '—'; return Number(n).toLocaleString('fa-IR',{maximumFractionDigits:d==null?0:d,minimumFractionDigits:d==null?0:d}); };
+var mmss = function(t){ var m=Math.floor(t/60), s=Math.floor(t%60); return fa(m)+':'+(s<10?'۰':'')+fa(s); };
+
+var state = {view:75, stack:false, key:'cross', seed:1, rate:750, speed:2, paused:false, nodeIdx:0, chart:'delay', auto:false, nextAuto:70};
+var opts = {leftMode:'protected', leftFixed:12, greenFixed:35, riskRed:true, evModule:true, coopt:true, fault:false};
+var world = null;
+
+/* ---------- theme ---------- */
+var css = {};
+function readCss(){
+  var cs = getComputedStyle(document.documentElement);
+  ['--ground','--block','--walk','--road','--mark','--curb','--sig-r','--sig-y','--sig-g','--housing','--fg','--muted','--line','--smart','--cur','--surface','--bad'].forEach(function(k){ css[k]=cs.getPropertyValue(k).trim(); });
+}
+function setTheme(v){
+  if(v) document.documentElement.setAttribute('data-theme',v); else document.documentElement.removeAttribute('data-theme');
+  try{ if(v) localStorage.setItem('tl-theme',v); }catch(e){}
+  readCss();
+}
+try{ var sv=localStorage.getItem('tl-theme'); if(sv==='dark'||sv==='light') document.documentElement.setAttribute('data-theme',sv); }catch(e){}
+$('theme').onclick=function(){
+  var cur=document.documentElement.getAttribute('data-theme');
+  if(!cur) cur = matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  setTheme(cur==='dark'?'light':'dark');
+};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){setTimeout(readCss,30)});
+
+/* ---------- controls ---------- */
+var PRESETS=[['آرام',300],['معمولی',500],['ساعت اوج مشهد',750],['شلوغ شدید',950]];
+Object.keys(T.SCENARIOS).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=T.SCENARIOS[k].name;$('scn').appendChild(o);});
+PRESETS.forEach(function(p){var b=document.createElement('button');b.className='btn';b.type='button';b.textContent=p[0];b.onclick=function(){state.rate=p[1];$('rate').value=p[1];applyRate();};$('presets').appendChild(b);});
+[[1,'×۱'],[2,'×۲'],[4,'×۴'],[8,'×۸']].forEach(function(s){var b=document.createElement('button');b.type='button';b.textContent=s[1];b.dataset.s=s[0];b.onclick=function(){state.speed=s[0];markSeg();};$('speed').appendChild(b);});
+[[50,'نزدیک'],[75,'متوسط'],[125,'کامل']].forEach(function(s){var b=document.createElement('button');b.type='button';b.textContent=s[1];b.dataset.s=s[0];b.onclick=function(){state.view=s[0];markView();geom();resizeAll();};$('viewsel').appendChild(b);});
+[[false,'کنار هم'],[true,'زیر هم (بزرگ)']].forEach(function(s){var b=document.createElement('button');b.type='button';b.textContent=s[1];b.dataset.s=s[0];b.onclick=function(){state.stack=s[0];markView();$('panels').classList.toggle('stack',state.stack||state.key==='corridor');resizeAll();};$('laysel').appendChild(b);});
+function markView(){Array.prototype.forEach.call($('viewsel').children,function(b){b.classList.toggle('on',+b.dataset.s===state.view)});Array.prototype.forEach.call($('laysel').children,function(b){b.classList.toggle('on',(b.dataset.s==='true')===state.stack)});}
+function markSeg(){Array.prototype.forEach.call($('speed').children,function(b){b.classList.toggle('on',+b.dataset.s===state.speed)});}
+[['delay','تأخیر'],['queue','صف']].forEach(function(s){var b=document.createElement('button');b.type='button';b.textContent=s[1];b.dataset.s=s[0];b.onclick=function(){state.chart=s[0];markChart();drawChart();};$('chartsel').appendChild(b);});
+function markChart(){Array.prototype.forEach.call($('chartsel').children,function(b){b.classList.toggle('on',b.dataset.s===state.chart)});}
+function applyRate(){
+  $('ratev').textContent=fa(state.rate)+' خودرو/ساعت در هر ورودیِ اصلی (شرق و غرب)؛ ورودی‌های شمال و جنوب ۶۵٪ آن';
+  if(world) world.setRate(state.rate);
+}
+$('rate').oninput=function(){state.rate=+this.value;applyRate();};
+$('lf').oninput=function(){opts.leftFixed=+this.value;$('lfv').textContent=fa(this.value)+' ثانیه (هر دو جهت)';};
+$('lm').onchange=function(){opts.leftMode=this.value;build();};
+$('gf').oninput=function(){opts.greenFixed=+this.value;$('gfv').textContent=fa(this.value)+' ثانیه برای هر فاز';};
+$('fault').onchange=function(){opts.fault=this.checked;};
+$('risk').onchange=function(){opts.riskRed=this.checked;};
+$('evm').onchange=function(){opts.evModule=this.checked;};
+$('coop').onchange=function(){opts.coopt=this.checked;};
+$('auto').onchange=function(){state.auto=this.checked; state.nextAuto=world.t+40;};
+$('pause').onclick=function(){state.paused=!state.paused;this.textContent=state.paused?'▶ ادامه':'⏸ توقف';};
+$('reset').onclick=function(){build();};
+$('rand').onclick=function(){
+  state.seed=Math.floor(Math.random()*90000)+1;
+  state.rate=Math.round((260+Math.random()*380)/10)*10; $('rate').value=state.rate;
+  build();
+};
+$('scn').onchange=function(){state.key=this.value;build();};
+$('surge').onclick=function(){
+  var lab=world.surge();
+  var m='هجوم ناگهانی ترافیک از ورودی «'+lab+'» (۲٫۶ برابر، ۹۰ ثانیه)';
+  world.base.evSay(m,'info');world.smart.evSay(m,'info');
+};
+Array.prototype.forEach.call(document.querySelectorAll('[data-ev]'),function(b){b.onclick=function(){ addEV(b.dataset.ev); };});
+function addEV(kind){
+  var r=world.addEV(kind);
+  var m=KIND[kind]+' وارد شد؛ ورودی «'+r.label+'»'+(r.spec.gps?' (دارای GPS اولویت)':' (بدون GPS؛ فقط دید + صدا)');
+  world.base.evSay(m,'info');world.smart.evSay(m,'info');
+}
+
+/* ---------- world ---------- */
+function resetStats(s){ s.stats={n:0,sumStop:0,sumTravel:0,sumStops:0,redRuns:0,rejected:0,risky:0,ev:[],recent:[],preempts:0}; s.log=[]; s.evLog=[]; }
+function build(){
+  world=new T.World(state.key,opts,state.seed);
+  world.setRate(state.rate);
+  for(var i=0;i<900;i++) world.step(0.1);   // 90 s warm-up so queues already exist
+  resetStats(world.base);resetStats(world.smart);world.hist=[];world.lastHist=world.t;
+  state.nodeIdx=0; state.nextAuto=world.t+60;
+  var sel=$('nodesel'); sel.innerHTML='';
+  world.smart.net.nodes.forEach(function(n,i){var o=document.createElement('option');o.value=i;o.textContent='چهارراه '+fa(i+1);sel.appendChild(o);});
+  sel.style.display=world.smart.net.nodes.length>1?'':'none';
+  $('lanenote').textContent = world.smart.net.protected ? 'چپ محافظت‌شده: هر ورودی سه‌لاین؛ لاین داخلی فقط چپ با فلش جدا، دو لاین دیگر مستقیم (و راست)' : 'چپ آزاد: هر ورودی دولاینه؛ لاین داخلی چپ/مستقیم، بیرونی مستقیم/راست';
+  $('seedv').textContent='بذر تصادفی: '+fa(state.seed);
+  $('panels').classList.toggle('stack', state.stack||state.key==='corridor');
+  geom(); resizeAll(); lastLogSig=''; lastELogSig=''; refreshText(true);
+}
+$('nodesel').onchange=function(){state.nodeIdx=+this.value;lastLogSig='';};
+
+/* ---------- geometry/rendering ---------- */
+var C=T.consts, bbox, views={};
+function viewRange(){return Math.min(state.view,C.ENTRY);}
+function geom(){
+  var ns=world.base.net.nodes, m=C.R+viewRange()+4, x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+  ns.forEach(function(n){x0=Math.min(x0,n.x-m);x1=Math.max(x1,n.x+m);y0=Math.min(y0,n.y-m);y1=Math.max(y1,n.y+m);});
+  bbox={x0:x0,y0:y0,w:x1-x0,h:y1-y0};
+}
+function setup(cv){
+  var dpr=Math.min(window.devicePixelRatio||1,2), w=cv.clientWidth||300, h=Math.round(w*bbox.h/bbox.w);
+  cv.style.height=h+'px'; cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+  return {cv:cv,ctx:cv.getContext('2d'),dpr:dpr,k:w/bbox.w*dpr};
+}
+function resizeAll(){
+  if(!bbox) return;
+  views.cur=setup($('cv-cur')); views.smart=setup($('cv-smart'));
+  var ch=$('chart'), dpr=Math.min(window.devicePixelRatio||1,2); ch.width=Math.round(ch.clientWidth*dpr); ch.height=Math.round(210*dpr);
+  drawChart();
+}
+if(window.ResizeObserver){ new ResizeObserver(function(){resizeAll();}).observe(document.body); } else window.addEventListener('resize',resizeAll);
+
+var CARCOL=['#9fb3b0','#c9b79c','#7f9ac4','#b9a3b8','#d3d3cc','#6f8f86','#c47f7a','#8d8f9a'];
+function isInt(n,s){return !!(n.inL[s]&&n.inL[s][0].kind==='internal');}
+function rr(ctx,x,y,w,h,r){r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+var BODY={car:[4.9,2.15],moto:[2.4,1.0],amb:[6.4,2.5],fire:[10,2.8],police:[5.0,2.15]};
+function drawVeh(ctx,veh,p,now){
+  var sz=BODY[veh.kind], len=sz[0], wid=sz[1], hl=len/2, hw=wid/2, flash=Math.floor(now/110)%2;
+  ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.ang); ctx.scale(1.18,1.18);
+  // shadow
+  ctx.fillStyle='rgba(0,0,0,.28)'; rr(ctx,-hl+.35,-hw+.45,len,wid,wid*.3); ctx.fill();
+  var col;
+  if(veh.kind==='car') col=CARCOL[veh.id%CARCOL.length]; else if(veh.kind==='moto') col='#3a4046';
+  else if(veh.kind==='amb') col='#fbfbfb'; else if(veh.kind==='fire') col='#d8342a'; else col='#f3f3f3';
+  ctx.fillStyle=col; rr(ctx,-hl,-hw,len,wid,Math.min(wid*.35,1)); ctx.fill();
+  ctx.lineWidth=.18; ctx.strokeStyle='rgba(0,0,0,.45)'; ctx.stroke();
+  if(veh.kind==='moto'){
+    ctx.fillStyle='#f0c24a'; ctx.beginPath(); ctx.arc(-.1,0,.62,0,6.3); ctx.fill();
+    ctx.fillStyle='#222'; ctx.beginPath(); ctx.arc(.25,0,.38,0,6.3); ctx.fill();
+  } else {
+    // glass
+    ctx.fillStyle='rgba(20,34,40,.78)';
+    rr(ctx,hl*.12,-hw+.28,len*.2,wid-.56,.35); ctx.fill();            // windshield
+    rr(ctx,-hl*.62,-hw+.3,len*.12,wid-.6,.3); ctx.fill();            // rear glass
+    if(veh.kind==='fire'){ ctx.fillStyle='#e8e8e8'; ctx.fillRect(-hl*.5,-.35,len*.4,.7); ctx.fillStyle='rgba(0,0,0,.25)'; for(var i=0;i<5;i++) ctx.fillRect(-hl*.48+i*len*.085,-.35,.15,.7); }
+    if(veh.kind==='amb'){ ctx.fillStyle='#d12'; ctx.fillRect(-hl*.55,-.3,hl*.55,.6); ctx.fillRect(-hl*.55+hl*.275-.3,-hw*.55,.6,hw*1.1); }
+    if(veh.kind==='police'){ ctx.fillStyle='#2f5fd0'; ctx.fillRect(-hl*.35,-hw,len*.38,.55); ctx.fillRect(-hl*.35,hw-.55,len*.38,.55); }
+    // lights
+    var braking=veh.v<1.2;
+    ctx.fillStyle=braking?'#ff2d2d':'#7a1a1a'; ctx.fillRect(-hl,-hw+.1,.35,.55); ctx.fillRect(-hl,hw-.65,.35,.55);
+    ctx.fillStyle='#fff6c8'; ctx.fillRect(hl-.35,-hw+.1,.35,.55); ctx.fillRect(hl-.35,hw-.65,.35,.55);
+  }
+  if(veh.curWait>90){ ctx.strokeStyle=css['--sig-r']; ctx.lineWidth=.45; rr(ctx,-hl-.6,-hw-.6,len+1.2,wid+1.2,1); ctx.stroke(); }
+  if(veh.isEV){
+    var a=flash?'#ff2d2d':'#2f7bff', b=flash?'#2f7bff':'#ff2d2d';
+    ctx.fillStyle=a; ctx.fillRect(hl*.18,-hw+.1,.9,hw-.1); ctx.fillStyle=b; ctx.fillRect(hl*.18,0,.9,hw-.1);
+    ctx.globalAlpha=.4; ctx.fillStyle=a; ctx.beginPath(); ctx.arc(hl*.18+.45,-hw*.5,2.8,0,6.3); ctx.fill();
+    ctx.fillStyle=b; ctx.beginPath(); ctx.arc(hl*.18+.45,hw*.5,2.8,0,6.3); ctx.fill(); ctx.globalAlpha=1;
+  }
+  ctx.restore();
+  if(veh.isEV){ ctx.strokeStyle='rgba(255,59,48,.65)'; ctx.lineWidth=.5; ctx.beginPath(); ctx.arc(p.x,p.y,hl+2.5+((now/90)%4),0,6.3); ctx.stroke(); }
+}
+
+function drawSim(v,sim,isSmart,now){
+  var ctx=v.ctx,k=v.k,R=C.R,NL=sim.net.lanes,rng=viewRange(),DIRS=[[0,-1],[1,0],[0,1],[-1,0]];
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle=css['--ground']; ctx.fillRect(0,0,v.cv.width,v.cv.height);
+  ctx.save(); ctx.scale(k,k); ctx.translate(-bbox.x0,-bbox.y0);
+  var nodes=sim.net.nodes;
+  // city blocks
+  ctx.fillStyle=css['--block'];
+  nodes.forEach(function(n){ [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(function(q,qi){
+    // skip block where road is absent? still fine
+    var sx=q[0],sy=q[1], g=R+5, ext=Math.min(C.SPACING/2-R-5, rng+20);
+    if(sx>0&&isInt(n,1)) ext=C.SPACING-2*(R+5)>0?Math.min(ext,C.SPACING-2*(R+5)):ext;
+    rr(ctx, sx>0?n.x+g:n.x-g-ext, sy>0?n.y+g:n.y-g-ext, ext, ext, 3); ctx.fill(); }); });
+  // sidewalk + roads
+  ctx.lineCap='butt';
+  var W=2*NL*C.LW;
+  nodes.forEach(function(n){ for(var s=0;s<4;s++){ if(!n.sides[s]) continue; var d=DIRS[s], len=isInt(n,s)?C.SPACING:R+C.ENTRY;
+    ctx.strokeStyle=css['--walk']; ctx.lineWidth=W+5; ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(n.x+d[0]*len,n.y+d[1]*len); ctx.stroke(); }
+    ctx.fillStyle=css['--walk']; ctx.fillRect(n.x-R-2.5,n.y-R-2.5,2*R+5,2*R+5); });
+  nodes.forEach(function(n){ for(var s=0;s<4;s++){ if(!n.sides[s]) continue; var d=DIRS[s], len=isInt(n,s)?C.SPACING:R+C.ENTRY;
+    ctx.strokeStyle=css['--road']; ctx.lineWidth=W; ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(n.x+d[0]*len,n.y+d[1]*len); ctx.stroke(); }
+    ctx.fillStyle=css['--road']; ctx.fillRect(n.x-R,n.y-R,2*R,2*R); });
+  // lane marks
+  ctx.strokeStyle=css['--mark']; ctx.lineWidth=.3; ctx.globalAlpha=.8;
+  nodes.forEach(function(n){ for(var s=0;s<4;s++){ if(!n.sides[s]) continue; var d=DIRS[s], len=isInt(n,s)?C.SPACING-R:C.ENTRY;
+    ctx.setLineDash([]); ctx.strokeStyle='#e8b923'; ctx.lineWidth=.28;
+    var r=[-d[1],d[0]];
+    [-.3,.3].forEach(function(o){ ctx.beginPath(); ctx.moveTo(n.x+d[0]*R+r[0]*o,n.y+d[1]*R+r[1]*o); ctx.lineTo(n.x+d[0]*(R+len)+r[0]*o,n.y+d[1]*(R+len)+r[1]*o); ctx.stroke(); });
+    ctx.strokeStyle=css['--mark']; ctx.lineWidth=.22; ctx.setLineDash([2.5,3]);
+    var dv=[]; for(var kk=1;kk<NL;kk++){dv.push(-kk*C.LW,kk*C.LW);} var nd=dv.length; dv.push(-W/2+.3,W/2-.3);
+    dv.forEach(function(o,oi){ if(oi>=nd) ctx.setLineDash([]); else ctx.setLineDash([2.5,3]); ctx.beginPath(); ctx.moveTo(n.x+d[0]*R+r[0]*o,n.y+d[1]*R+r[1]*o); ctx.lineTo(n.x+d[0]*(R+len)+r[0]*o,n.y+d[1]*(R+len)+r[1]*o); ctx.stroke(); }); ctx.setLineDash([]);
+    // zebra
+    ctx.fillStyle=css['--mark']; ctx.globalAlpha=.9;
+    for(var z=-W/2+.7; z<W/2-.6; z+=1.4){ ctx.save(); ctx.translate(n.x+d[0]*(R-1.6)+r[0]*z, n.y+d[1]*(R-1.6)+r[1]*z); ctx.rotate(Math.atan2(d[1],d[0])); ctx.fillRect(-1.6,-.4,3.2,.8); ctx.restore(); }
+    ctx.globalAlpha=.8; }});
+  ctx.globalAlpha=1;
+  // stop lines + signal heads
+  nodes.forEach(function(n){
+    for(var s=0;s<4;s++){ if(!n.sides[s]||!n.inL[s]) continue;
+      var d=DIRS[s], h=[-d[0],-d[1]], r=[-h[1],h[0]];
+      var lt=sim.light(n,s), col=lt==='G'?css['--sig-g']:(lt==='Y'?css['--sig-y']:css['--sig-r']);
+      var bx=n.x+d[0]*(R+.4), by=n.y+d[1]*(R+.4);
+      ctx.strokeStyle=col; ctx.lineWidth=.9; ctx.beginPath(); ctx.moveTo(bx,by); ctx.lineTo(bx+r[0]*W/2,by+r[1]*W/2); ctx.stroke();
+      // 3-lamp head on the sidewalk, upright for readability
+      var hx=n.x+d[0]*(R+3)+r[0]*(W/2+3.6), hy=n.y+d[1]*(R+3)+r[1]*(W/2+3.6);
+      ctx.fillStyle=css['--housing']; rr(ctx,hx-2,hy-5.2,4,10.4,1.4); ctx.fill();
+      [['R',css['--sig-r'],-3.2],['Y',css['--sig-y'],0],['G',css['--sig-g'],3.2]].forEach(function(l){
+        var on=(lt==='R'&&l[0]==='R')||(lt==='Y'&&l[0]==='Y')||(lt==='G'&&l[0]==='G');
+        ctx.globalAlpha=on?1:.18; ctx.fillStyle=l[1]; ctx.beginPath(); ctx.arc(hx,hy+l[2],1.35,0,6.3); ctx.fill();
+        if(on){ ctx.globalAlpha=.28; ctx.beginPath(); ctx.arc(hx,hy+l[2],3,0,6.3); ctx.fill(); } ctx.globalAlpha=1; });
+      if(sim.net.protected){
+        var ll=sim.light(n,s,3), lc=ll==='G'?css['--sig-g']:(ll==='Y'?css['--sig-y']:css['--sig-r']);
+        var ax=hx+r[0]*5.2, ay=hy+r[1]*5.2, lv=[-r[0],-r[1]];   // arrow points to the driver's left
+        ctx.fillStyle=css['--housing']; rr(ctx,ax-2.3,ay-2.6,4.6,5.2,1.3); ctx.fill();
+        if(ll!=='R'){ ctx.globalAlpha=.28; ctx.fillStyle=lc; ctx.beginPath(); ctx.arc(ax,ay,3.3,0,6.3); ctx.fill(); ctx.globalAlpha=1; }
+        ctx.fillStyle=lc; ctx.globalAlpha=ll==='R'?.35:1;
+        ctx.beginPath(); ctx.moveTo(ax+lv[0]*1.7,ay+lv[1]*1.7); ctx.lineTo(ax-lv[0]*1.1-lv[1]*1.3,ay-lv[1]*1.1+lv[0]*1.3); ctx.lineTo(ax-lv[0]*1.1+lv[1]*1.3,ay-lv[1]*1.1-lv[0]*1.3); ctx.closePath(); ctx.fill(); ctx.globalAlpha=1;
+      }
+      if(!isSmart){
+        var rem=sim.countdown(n,s,0);
+        var tx=hx+(r[0]>=0?1:-1)*(r[0]!==0?5.5:0), ty=hy+(r[0]!==0?0:(r[1]>0?9:-9));
+        ctx.save(); ctx.font='800 5px Vazirmatn,Tahoma,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        var tw=ctx.measureText(fa(Math.ceil(rem))).width+2.6; ctx.fillStyle=css['--housing']; rr(ctx,tx-tw/2,ty-3.2,tw,6.4,1.6); ctx.fill();
+        ctx.fillStyle=col; ctx.fillText(fa(Math.ceil(rem)),tx,ty+.3); ctx.restore();
+      }
+    }});
+  // vehicles (EVs on top)
+  var list=sim.vehs.slice().sort(function(a,b){return (a.isEV?1:0)-(b.isEV?1:0);});
+  list.forEach(function(veh){ drawVeh(ctx,veh,sim.pose(veh),now); });
+  // queue/pending beyond the visible window
+  sim.net.entries.forEach(function(E,i){
+    var hid=0; E.lanes.forEach(function(El){ El.vehicles.forEach(function(w){ if(El.len-w.s>rng+8) hid++; }); });
+    var q=hid; sim.pending[i].forEach(function(pq){q+=pq.length;}); if(q>0){
+    var n=E.toNode, d=DIRS[E.toSide], dist=R+Math.min(rng,C.ENTRY)-5, r=[-d[1],d[0]];
+    var ox=n.x+d[0]*dist+r[0]*C.LW*NL, oy=n.y+d[1]*dist+r[1]*C.LW*NL;
+    var bt='+'+fa(q)+' پشت صف'; ctx.font='800 5px Vazirmatn,sans-serif'; var bw=ctx.measureText(bt).width+6;
+    ox=Math.max(bbox.x0+bw/2+1,Math.min(bbox.x0+bbox.w-bw/2-1,ox)); oy=Math.max(bbox.y0+5,Math.min(bbox.y0+bbox.h-5,oy));
+    ctx.fillStyle=css['--bad']; rr(ctx,ox-bw/2,oy-3.5,bw,7,2.5); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(bt,ox,oy+.2); } });
+  if(isSmart){
+    nodes.forEach(function(n){
+      if(n.pre){ ctx.strokeStyle='#2f7bff'; ctx.lineWidth=1.1; ctx.beginPath(); ctx.arc(n.x,n.y,R+7+((now/120)%4),0,6.3); ctx.stroke(); }
+      var label = n.pre? 'اولویت اورژانس' : (n.fallback? 'حالت امن · زمان‌ثابت' : 'تطبیقی');
+      var colr = n.pre? '#2f7bff' : (n.fallback? css['--cur'] : css['--smart']);
+      ctx.font='800 5.2px Vazirmatn,Tahoma,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      var tw=ctx.measureText(label).width+7, ty=n.y-R-11;
+      ctx.fillStyle=colr; rr(ctx,n.x-tw/2,ty-4,tw,8,2.5); ctx.fill();
+      ctx.fillStyle='#fff'; ctx.fillText(label,n.x,ty+.3);
+    });
+  }
+  ctx.restore();
+}
+
+/* ---------- chart ---------- */
+function drawChart(){
+  var cv=$('chart'); if(!cv||!world) return; var ctx=cv.getContext('2d'), W=cv.width, H=cv.height, dpr=W/cv.clientWidth;
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,W,H);
+  var h=world.hist; var padL=40*dpr,padB=22*dpr,padT=8*dpr,padR=8*dpr;
+  var ka=state.chart==='delay'?'a':'qa', kb=state.chart==='delay'?'b':'qb';
+  var mx=10; h.forEach(function(p){mx=Math.max(mx,p[ka],p[kb]);}); mx=Math.ceil(mx*1.1/10)*10;
+  ctx.strokeStyle=css['--line']; ctx.fillStyle=css['--muted']; ctx.lineWidth=1; ctx.font=(11*dpr)+'px Vazirmatn,Tahoma,sans-serif'; ctx.textAlign='right';
+  for(var i=0;i<=4;i++){ var y=padT+(H-padT-padB)*i/4; ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke(); ctx.fillText(fa(mx*(1-i/4)),padL-5*dpr,y+4*dpr); }
+  if(h.length<2){ ctx.textAlign='center'; ctx.fillText('در انتظار داده…',W/2,H/2); return; }
+  var t0=h[0].t, t1=h[h.length-1].t, span=Math.max(60,t1-t0);
+  function X(t){return padL+(W-padL-padR)*(t-t0)/span;} function Y(v){return padT+(H-padT-padB)*(1-v/mx);}
+  [[ka,css['--cur']],[kb,css['--smart']]].forEach(function(s){
+    ctx.strokeStyle=s[1]; ctx.lineWidth=2*dpr; ctx.lineJoin='round'; ctx.beginPath();
+    h.forEach(function(p,i){ var x=X(p.t),y=Y(p[s[0]]); if(i) ctx.lineTo(x,y); else ctx.moveTo(x,y); }); ctx.stroke(); });
+  ctx.textAlign='center'; ctx.fillStyle=css['--muted']; ctx.fillText(state.chart==='delay'?'ثانیه — میانگین توقف (۲ دقیقه‌ی اخیر)':'خودرو در صف', W/2, H-5*dpr);
+}
+
+/* ---------- text/metrics ---------- */
+var lastLogSig='', lastELogSig='';
+function kpi(el,m){
+  el.innerHTML='<span>توقف میانگین <b>'+fa(m.recentStop,0)+' ث</b></span><span>صف <b>'+fa(m.queue)+'</b></span><span>سرعت <b>'+fa(m.avgKmh,0)+' km/h</b></span><span>عبور کرده <b>'+fa(m.done)+'</b></span>';
+}
+function row(label,a,b,fmt,lowerBetter,hint){
+  var d='—',cls='eq';
+  if(a!=null&&b!=null&&isFinite(a)&&isFinite(b)){
+    var base=Math.max(Math.abs(a),1e-9); var pct=(b-a)/base*100;
+    if(Math.abs(a)<1e-9&&Math.abs(b)<1e-9){d='برابر';}
+    else if(Math.abs(pct)<3){d='تقریباً برابر';}
+    else { var better=lowerBetter?(b<a):(b>a); cls=better?'good':'bad'; d='٪'+fa(Math.abs(pct))+(better?' بهتر':' بدتر'); if(Math.abs(a)<1e-9) d=better?'بهتر':'بدتر'; }
+  }
+  return '<tr><td>'+label+(hint?'<br><span class="note">'+hint+'</span>':'')+'</td><td class="n cur">'+fmt(a)+'</td><td class="n smart">'+fmt(b)+'</td><td><span class="delta '+cls+'">'+d+'</span></td></tr>';
+}
+var f0=function(v){return v==null?'—':fa(v,0)}, f1=function(v){return v==null?'—':fa(v,1)};
+function refreshText(force){
+  var a=world.base.metrics(), b=world.smart.metrics();
+  kpi($('kc'),a); kpi($('ks'),b);
+  $('mt').innerHTML =
+    row('میانگین توقف هر خودرو (ث)',a.recentStop,b.recentStop,f0,true,'۲ دقیقه‌ی اخیر، خودروهای عبورکرده')+
+    row('طول صف (خودرو)',a.queue,b.queue,f0,true)+
+    row('سرعت متوسط (km/h)',a.avgKmh,b.avgKmh,f0,false)+
+    row('بیشترین انتظار یک خودرو (ث)',a.maxWait,b.maxWait,f0,true,'معیار انصاف')+
+    row('خودروهای عبورکرده',a.done,b.done,f0,false)+
+    row('زمان رسیدن اورژانس تا خروج (ث)',a.evAvg,b.evAvg,f0,true,a.evN||b.evN?('تعداد: '+fa(a.evN)+' / '+fa(b.evN)):'هنوز اورژانسی نفرستاده‌اید')+
+    row('عبور ریسکی اورژانس از قرمز',a.risky,b.risky,f0,true,'در وضع فعلی تنها راهِ اورژانس است')+
+    '<tr><td>پیش‌دستی چراغ برای اورژانس<br><span class="note">با دنباله‌ی ایمن زرد ← تمام‌قرمز</span></td><td class="n cur">—</td><td class="n smart">'+fa(b.preempts)+'</td><td></td></tr>'+
+    '<tr><td>درخواست‌های ردشده توسط هسته‌ی ایمنی</td><td class="n cur">—</td><td class="n smart">'+fa(b.rejected)+'</td><td></td></tr>';
+  var bn=$('banner');
+  if(world.t<150){ bn.textContent='در حال گردآوری نتیجه… (به چند دقیقه شبیه‌سازی نیاز است)'; }
+  else {
+    var pct=a.recentStop>0?Math.round((a.recentStop-b.recentStop)/a.recentStop*100):0;
+    var s = pct>=3 ? 'روی همین ترافیک، سیستم هوشمند توقف هر خودرو را حدود ٪'+fa(pct)+' کمتر کرده است.' :
+            (pct<=-3 ? 'در این شرایط (احتمالاً نزدیک اشباع) زمان‌ثابت کمی بهتر یا برابر است؛ هوشمند همچنان حداکثر انتظار را کنترل می‌کند.' : 'در این شرایط هر دو سیستم تقریباً برابرند.');
+    if(b.evN&&a.evN&&a.evAvg>0){ var ep=Math.round((a.evAvg-b.evAvg)/a.evAvg*100); s+=' زمان اورژانس: '+(ep>=3?'٪'+fa(ep)+' کوتاه‌تر':(ep<=-3?'٪'+fa(-ep)+' بلندتر':'تقریباً برابر'))+'.'; }
+    bn.textContent=s;
+  }
+  // inspector
+  var n=world.smart.net.nodes[state.nodeIdx]||world.smart.net.nodes[0], sg=n.sig, sim=world.smart;
+  var mode = n.pre? '<span class="chip ev">اولویت اورژانس: '+KIND[n.pre.v.kind]+'</span>' : (n.fallback? '<span class="chip wd">حالت امن: برگشت به برنامه‌ی ثابت</span>' : '<span class="chip smart">کنترل تطبیقی (فشار + gap-out)</span>');
+  var st = sg.state==='G'?'سبز':(sg.state==='Y'?'زرد':'تمام‌قرمز');
+  var cph=n.phases[sg.phase], sides=cph.name;
+  $('mode').innerHTML = mode+' <span class="chip">فاز فعلی: '+sides+' · '+st+' · '+fa(sg.greenElapsed)+' ث</span> <span class="chip">اطمینان حسگر: ٪'+fa(n.conf*100)+'</span>';
+  var bars='', mxq=Math.max(8,Math.max.apply(null,n.pv.map(function(p){return p?p.q:0})));
+  for(var s=0;s<4;s++){ var p=n.pv[s]; if(!p) continue; var on=cph.sides.indexOf(s)>=0&&sg.state!=='AR';
+    bars+='<div class="bar"><span>'+T.SIDE_FA[s]+'</span><div class="track"><div class="fill'+(on?' on':'')+'" style="width:'+Math.min(100,p.q/mxq*100)+'%"></div></div><span class="val">'+fa(p.q,1)+'</span></div>'; }
+  $('bars').innerHTML=bars;
+  var lp=n.lastPressure; $('pnote').textContent='فشار فاز فعلی '+fa(lp[0],1)+' در برابر فاز مقابل '+fa(lp[1],1)+'. نوار سبز = ورودی‌هایی که الان سبزند. فشار = صف دیده‌شده + سهمِ در راه − جریمه‌ی پرِ‌بودن مقصد + کمی امتیاز انتظار.';
+  // logs
+  var sigL = sim.log.length+':'+(sim.log[0]?sim.log[0].t:0)+':'+state.nodeIdx;
+  if(force||sigL!==lastLogSig){ lastLogSig=sigL; $('dlog').innerHTML = sim.log.slice(0,40).map(function(e){return '<div class="'+e.kind+'"><time>'+mmss(e.t-0)+'</time>'+e.text+'</div>';}).join('') || '<div class="note">هنوز تصمیمی ثبت نشده…</div>'; }
+  var ev=[]; world.base.evLog.forEach(function(e){ev.push({t:e.t,k:e.kind,x:'[فعلی] '+e.text});}); world.smart.evLog.forEach(function(e){ev.push({t:e.t,k:e.kind,x:'[هوشمند] '+e.text});});
+  ev.sort(function(p,q){return q.t-p.t});
+  var sigE = ev.length+':'+(ev[0]?ev[0].t+ev[0].x.length:0);
+  if(force||sigE!==lastELogSig){ lastELogSig=sigE; $('elog').innerHTML = ev.slice(0,50).map(function(e){return '<div class="'+e.k+'"><time>'+mmss(e.t)+'</time>'+e.x+'</div>';}).join('') || '<div class="note">با دکمه‌ی آمبولانس/آتش‌نشانی/پلیس یک خودروی اورژانس بفرستید و رفتار دو سیستم را مقایسه کنید.</div>'; }
+}
+
+/* ---------- main loop ---------- */
+var last=performance.now(), acc=0, txtT=0;
+function frame(now){
+  var dtr=Math.min(0.08,(now-last)/1000); last=now;
+  if(!state.paused){
+    acc+=dtr*state.speed; var steps=0;
+    while(acc>=0.1&&steps<40){ world.step(0.1); acc-=0.1; steps++; }
+    if(acc>1) acc=0;
+    if(state.auto&&world.t>=state.nextAuto){
+      state.nextAuto=world.t+45+Math.random()*75;
+      var r=Math.random();
+      if(r<.4){ var lab=world.surge(); var m='رویداد تصادفی: هجوم ناگهانی ترافیک از «'+lab+'»'; world.base.evSay(m,'info'); world.smart.evSay(m,'info'); }
+      else addEV(['amb','amb','fire','police'][Math.floor(Math.random()*4)]);
+    }
+  }
+  if(views.cur){ drawSim(views.cur,world.base,false,now); drawSim(views.smart,world.smart,true,now); }
+  if(now-txtT>350){ txtT=now; refreshText(false); drawChart(); }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- init ---------- */
+readCss();
+$('rate').value=state.rate; $('gf').value=opts.greenFixed; $('lf').value=opts.leftFixed; $('lfv').textContent=fa(opts.leftFixed)+' ثانیه (هر دو جهت)'; $('gfv').textContent=fa(opts.greenFixed)+' ثانیه برای هر فاز';
+$('lm').value=opts.leftMode; $('scn').value=state.key; markSeg(); markView(); markChart();
+var doc=document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve();
+build(); applyRate();
+requestAnimationFrame(frame);
+doc.then(function(){readCss();});
+window.__lab={get world(){return world}};
+})();
+</script>
+
+</body></html>

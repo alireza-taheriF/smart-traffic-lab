@@ -1,0 +1,4 @@
+node_modules/
+results/video/
+results/*.log
+.DS_Store

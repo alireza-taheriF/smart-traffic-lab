@@ -1,0 +1,17 @@
+{
+  "name": "smart-traffic-lab",
+  "version": "1.0.0",
+  "description": "Live simulator comparing a fixed-time traffic signal (as common in Iran) with an adaptive max-pressure controller, safety kernel and emergency-vehicle preemption.",
+  "license": "MIT",
+  "author": "alireza-taheriF",
+  "main": "src/traffic-core.js",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "node --test tests/*.test.js",
+    "bench": "node bench/run.js cross protected 5",
+    "bench:all": "for s in cross tee corridor grid; do for m in protected permissive; do node bench/run.js $s $m 5; done; done && node bench/ablation.js && node bench/emergency.js && node scripts/report.js",
+    "report": "node scripts/report.js",
+    "serve": "python3 -m http.server 8080 --directory docs"
+  },
+  "engines": { "node": ">=18" }
+}

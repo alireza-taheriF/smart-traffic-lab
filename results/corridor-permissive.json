@@ -1,0 +1,74 @@
+[
+ {
+  "scenario": "corridor",
+  "mode": "permissive",
+  "rate": 300,
+  "seeds": 5,
+  "fixed": {
+   "delayAll": 18.650031216562244,
+   "delayDone": 18.577236539537484,
+   "queue": 8.454666666666666,
+   "maxWait": 52.82000000000048,
+   "thr": 1773.6
+  },
+  "smart": {
+   "delayAll": 6.457346047006958,
+   "delayDone": 6.504197136702141,
+   "queue": 3.3400000000000007,
+   "maxWait": 35.94000000000024,
+   "thr": 1786.08
+  },
+  "gainAll": 0.6532970684965321,
+  "gainAllSd": 0.01735678852498472,
+  "gainDone": 0.6493813586616843,
+  "conflicts": 0
+ },
+ {
+  "scenario": "corridor",
+  "mode": "permissive",
+  "rate": 600,
+  "seeds": 5,
+  "fixed": {
+   "delayAll": 26.883035565090104,
+   "delayDone": 27.01568979021843,
+   "queue": 26.425333333333334,
+   "maxWait": 189.22000000000108,
+   "thr": 3538.0800000000004
+  },
+  "smart": {
+   "delayAll": 12.143017002216437,
+   "delayDone": 12.248445559468013,
+   "queue": 12.346666666666668,
+   "maxWait": 77.23999999999975,
+   "thr": 3557.28
+  },
+  "gainAll": 0.5448391763434999,
+  "gainAllSd": 0.04268528751667477,
+  "gainDone": 0.543015243514479,
+  "conflicts": 0
+ },
+ {
+  "scenario": "corridor",
+  "mode": "permissive",
+  "rate": 900,
+  "seeds": 5,
+  "fixed": {
+   "delayAll": 122.89748421001555,
+   "delayDone": 73.54814709941083,
+   "queue": 190.84266666666667,
+   "maxWait": 1042.1000000000843,
+   "thr": 4608.960000000001
+  },
+  "smart": {
+   "delayAll": 79.23361795815069,
+   "delayDone": 64.72119609750496,
+   "queue": 122.62133333333334,
+   "maxWait": 550.4400000000567,
+   "thr": 4924.8
+  },
+  "gainAll": 0.3523231651325844,
+  "gainAllSd": 0.03300829718522872,
+  "gainDone": 0.10683913813781316,
+  "conflicts": 0
+ }
+]
