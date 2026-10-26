@@ -1,0 +1,222 @@
+{
+ "params": {
+  "seg": 48,
+  "clr": 0.3,
+  "insert_m3": 4,
+  "vtu_L": 170,
+  "vtu_W": 120,
+  "vtu_H": 56,
+  "vtu_lid_H": 16,
+  "vtu_wall": 3,
+  "vtu_r": 8,
+  "led_cols": 6,
+  "led_rows": 4,
+  "led_pitch": 8.5,
+  "led_hole": 5.2,
+  "mag_hole": 6.5,
+  "gland_d": 12.7,
+  "sma_d": 6.5,
+  "visor_L": 22,
+  "dh_W": 64,
+  "dh_H": 50,
+  "dh_L": 56,
+  "hood_W": 50,
+  "hood_H": 34,
+  "hood_L": 120,
+  "hood_visor": 30,
+  "tsop_h": 6.5,
+  "pole_D": 114,
+  "band_W": 13,
+  "tilt_max": 20,
+  "pan_max": 45,
+  "cu_L": 200,
+  "cu_W": 130,
+  "cu_H": 50,
+  "pcb_ax": 94,
+  "pcb_ay": 64,
+  "rly_x": 69,
+  "rly_y": 49
+ },
+ "parts": [
+  {
+   "part": "vtu_base",
+   "fa": "بدنه فرستنده (کفی)",
+   "material": "ASA / PETG",
+   "size_mm": [
+    170,
+    120,
+    56
+   ],
+   "volume_cm3": 166.5,
+   "grams_solid_PETG": 211,
+   "triangles": 16112,
+   "open_edges": 0,
+   "sec": 6.798
+  },
+  {
+   "part": "vtu_lid",
+   "fa": "درب فرستنده",
+   "material": "ASA / PETG",
+   "size_mm": [
+    170,
+    120,
+    17
+   ],
+   "volume_cm3": 76.6,
+   "grams_solid_PETG": 97,
+   "triangles": 5978,
+   "open_edges": 0,
+   "sec": 1.227
+  },
+  {
+   "part": "vtu_bezel",
+   "fa": "قاب پنجره IR + سایه‌بان",
+   "material": "ASA / PETG",
+   "size_mm": [
+    48,
+    84,
+    25
+   ],
+   "volume_cm3": 12.2,
+   "grams_solid_PETG": 16,
+   "triangles": 4336,
+   "open_edges": 0,
+   "sec": 0.512
+  },
+  {
+   "part": "vtu_led_plate",
+   "fa": "نگهدارنده آرایه LED",
+   "material": "PETG",
+   "size_mm": [
+    47,
+    62,
+    19
+   ],
+   "volume_cm3": 9.4,
+   "grams_solid_PETG": 12,
+   "triangles": 4192,
+   "open_edges": 0,
+   "sec": 0.917
+  },
+  {
+   "part": "dh_body",
+   "fa": "بدنه هد گیرنده + کاور",
+   "material": "ASA (مشکی مات)",
+   "size_mm": [
+    50,
+    76,
+    206
+   ],
+   "volume_cm3": 118.3,
+   "grams_solid_PETG": 150,
+   "triangles": 6486,
+   "open_edges": 0,
+   "sec": 1.65
+  },
+  {
+   "part": "dh_back",
+   "fa": "درب پشت هد",
+   "material": "ASA",
+   "size_mm": [
+    50,
+    64,
+    8
+   ],
+   "volume_cm3": 12.8,
+   "grams_solid_PETG": 16,
+   "triangles": 6336,
+   "open_edges": 0,
+   "sec": 1.153
+  },
+  {
+   "part": "dh_gasket",
+   "fa": "واشر درب پشت",
+   "material": "TPU 95A",
+   "size_mm": [
+    50,
+    64,
+    1.5
+   ],
+   "volume_cm3": 1.2,
+   "grams_solid_PETG": 2,
+   "triangles": 60,
+   "open_edges": 0,
+   "sec": 0.004
+  },
+  {
+   "part": "dh_yoke",
+   "fa": "یوک تیلت/پن",
+   "material": "PETG / ASA",
+   "size_mm": [
+    68,
+    96,
+    60
+   ],
+   "volume_cm3": 63.9,
+   "grams_solid_PETG": 81,
+   "triangles": 3356,
+   "open_edges": 0,
+   "sec": 0.527
+  },
+  {
+   "part": "dh_saddle",
+   "fa": "زین بست تیر",
+   "material": "ASA / PETG",
+   "size_mm": [
+    104,
+    70,
+    88
+   ],
+   "volume_cm3": 177.4,
+   "grams_solid_PETG": 225,
+   "triangles": 2104,
+   "open_edges": 0,
+   "sec": 0.167
+  },
+  {
+   "part": "cu_base",
+   "fa": "جعبه کنترلر",
+   "material": "PETG",
+   "size_mm": [
+    200,
+    130,
+    50
+   ],
+   "volume_cm3": 156.9,
+   "grams_solid_PETG": 199,
+   "triangles": 11928,
+   "open_edges": 0,
+   "sec": 4.005
+  },
+  {
+   "part": "cu_lid",
+   "fa": "درب جعبه کنترلر",
+   "material": "PETG",
+   "size_mm": [
+    200,
+    130,
+    5.5
+   ],
+   "volume_cm3": 65.9,
+   "grams_solid_PETG": 84,
+   "triangles": 4836,
+   "open_edges": 0,
+   "sec": 1.137
+  },
+  {
+   "part": "cu_din",
+   "fa": "گیره ریل DIN",
+   "material": "PETG",
+   "size_mm": [
+    60,
+    56,
+    8.2
+   ],
+   "volume_cm3": 14.4,
+   "grams_solid_PETG": 18,
+   "triangles": 1598,
+   "open_edges": 0,
+   "sec": 0.127
+  }
+ ]
+}

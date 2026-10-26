@@ -1,0 +1,623 @@
+<title>EVP-12 3D Model</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a CAD workbench — full-height 3D bay beside a dense RTL control rail; signal amber marks the live state. */
+:root {
+  --bg: #e9edf1; --panel: #f8fafb; --ink: #17202a; --muted: #5b6875; --line: #cfd7df;
+  --accent: #d9930b; --accent-ink: #3a2600; --viewport: #dfe5eb; --grid: #b7c2cc; --ok: #1f8a4c; --warn: #b4560f;
+  --f-ui: "Vazirmatn", Tahoma, "Segoe UI", system-ui, sans-serif;
+  --f-num: "JetBrains Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1418; --panel: #161d23; --ink: #e3e9ee; --muted: #93a1ad; --line: #2a343d;
+  --accent: #f0ab1f; --accent-ink: #2a1a00; --viewport: #121920; --grid: #2c3842; --ok: #49c27c; --warn: #f08a3c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1418; --panel: #161d23; --ink: #e3e9ee; --muted: #93a1ad; --line: #2a343d;
+  --accent: #f0ab1f; --accent-ink: #2a1a00; --viewport: #121920; --grid: #2c3842; --ok: #49c27c; --warn: #f08a3c; color-scheme: dark }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-ui); font-size: 14px; direction: rtl; }
+.app { height: 100%; display: grid; grid-template-rows: auto 1fr; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px; gap: 12px; box-sizing: border-box; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.brand { display: flex; align-items: baseline; gap: 10px; }
+.brand b { font-family: var(--f-num); font-weight: 600; font-size: 18px; letter-spacing: .02em; direction: ltr; }
+.brand span { color: var(--muted); }
+.lamp { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); align-self: center; }
+.tabs { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+.tabs button { font: inherit; border: 0; background: transparent; color: var(--muted); padding: 6px 14px; border-radius: 7px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.tabs button:focus-visible, .btn:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.work { display: grid; grid-template-columns: minmax(300px, 360px) 1fr; gap: 12px; min-height: 0; }
+.bay { position: relative; min-height: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--viewport); }
+#view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.hud { position: absolute; inset: auto 12px 12px auto; display: flex; gap: 8px; align-items: center; background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 12px; color: var(--muted); }
+.hud .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.hud.busy .dot { background: var(--accent); animation: pulse .8s infinite alternate; }
+@keyframes pulse { to { opacity: .3 } }
+@media (prefers-reduced-motion: reduce) { .hud.busy .dot { animation: none } }
+.axes { position: absolute; top: 10px; left: 12px; font-family: var(--f-num); font-size: 11px; color: var(--muted); direction: ltr; }
+aside { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: auto; min-height: 0; display: flex; flex-direction: column; }
+section { padding: 14px 16px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+section:last-child { border-bottom: 0; }
+h2 { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--muted); }
+.facts { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-family: var(--f-num); direction: ltr; text-align: left; font-variant-numeric: tabular-nums; }
+.parts { display: grid; gap: 6px; }
+.part { display: grid; grid-template-columns: auto auto 1fr auto; gap: 8px; align-items: center; font-size: 13px; }
+.part .sw { width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--line); }
+.part small { display: block; color: var(--muted); font-size: 11px; }
+.part .meta { min-width: 0; }
+.part .dim { font-family: var(--f-num); direction: ltr; font-size: 11px; color: var(--muted); }
+.part.ref { opacity: .8; }
+.btn { font: inherit; font-size: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 7px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.param { display: grid; grid-template-columns: 1fr 74px; gap: 4px 10px; align-items: center; }
+.param label { font-size: 12.5px; }
+.param input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); margin: 0; }
+.param input[type=number] { width: 74px; box-sizing: border-box; font-family: var(--f-num); font-size: 12px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); direction: ltr; }
+.param.changed label { color: var(--accent); font-weight: 700; }
+.note { font-size: 12px; color: var(--muted); line-height: 1.7; }
+textarea { width: 100%; box-sizing: border-box; height: 90px; font-family: var(--f-num); font-size: 11px; direction: ltr; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); padding: 6px; resize: vertical; }
+.explode { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+.explode input { width: 100%; accent-color: var(--accent); }
+.toast { font-size: 12px; color: var(--ok); min-height: 1em; }
+@media (max-width: 820px) {
+  .app { height: auto; }
+  .work { grid-template-columns: 1fr; }
+  .bay { height: 62vh; min-height: 340px; order: -1; }
+  aside { overflow: visible; }
+}
+.part.sel .meta button { color: var(--accent) !important; font-weight: 700; }
+/* --- labels, part info card, simulation panel --- */
+.labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lbl { position: absolute; transform: translate(-50%, -100%); white-space: nowrap; font-size: 11.5px; line-height: 1.4; padding: 2px 8px; border-radius: 999px;
+  background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); color: var(--ink); pointer-events: auto; cursor: pointer; }
+.lbl::after { content: ""; position: absolute; left: 50%; bottom: -7px; width: 1px; height: 6px; background: var(--muted); }
+.lbl.sel, .lbl:hover { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.lbl.ref { color: var(--muted); font-style: normal; }
+.lbl.veh { background: #d32f2f; border-color: #d32f2f; color: #fff; font-weight: 700; }
+.lbl.cab { border-color: #3b82f6; }
+.lbl.hot { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+.lbl.muted { color: var(--muted); }
+.info { position: absolute; top: 12px; right: 12px; width: min(360px, calc(100% - 24px)); max-height: calc(100% - 70px); overflow: auto; box-sizing: border-box;
+  background: var(--panel); border: 1px solid var(--line); border-inline-start: 4px solid var(--accent); border-radius: 10px; padding: 12px 14px; display: grid; gap: 8px;
+  box-shadow: 0 8px 24px color-mix(in srgb, #000 18%, transparent); }
+.info h3 { margin: 0; font-size: 15px; display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+.info h3 button { font: inherit; font-size: 13px; border: 0; background: transparent; color: var(--muted); cursor: pointer; padding: 0 4px; }
+.info dl { margin: 0; display: grid; gap: 8px; }
+.info dt { font-size: 11.5px; font-weight: 700; color: var(--accent); letter-spacing: .02em; }
+.info dd { margin: 0; font-size: 13px; line-height: 1.8; }
+.info .spec { font-family: var(--f-num); font-size: 11px; color: var(--muted); direction: ltr; text-align: right; }
+.hint { position: absolute; bottom: 12px; right: 12px; font-size: 12px; color: var(--muted); background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; }
+.legend { position: absolute; bottom: 12px; right: 12px; display: grid; gap: 4px; font-size: 12px; background: color-mix(in srgb, var(--panel) 90%, transparent); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.legend i { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin-inline-end: 6px; border-radius: 2px; }
+.scen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.scen button { font: inherit; font-size: 12.5px; text-align: right; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 8px; padding: 7px 9px; cursor: pointer; }
+.scen button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, var(--bg)); font-weight: 700; }
+.expect { font-size: 12.5px; line-height: 1.8; background: var(--bg); border-radius: 8px; padding: 8px 10px; }
+.expect b { color: var(--accent); }
+.toggles { display: grid; gap: 6px; font-size: 13px; }
+.toggles label { display: flex; gap: 8px; align-items: center; }
+table.live { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table.live th { font-size: 11px; color: var(--muted); font-weight: 700; text-align: right; padding: 4px; border-bottom: 1px solid var(--line); }
+table.live td { padding: 5px 4px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.chip { display: inline-block; min-width: 42px; text-align: center; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; color: #fff; }
+.chip.G { background: #16a34a; } .chip.Y { background: #d39e00; color: #241a00; } .chip.R { background: #dc2626; }
+.irbar { display: inline-block; height: 6px; border-radius: 3px; background: var(--accent); vertical-align: middle; margin-inline-end: 6px; }
+.kv { display: grid; gap: 4px; font-size: 12.5px; line-height: 1.7; }
+.kv b { color: var(--muted); font-weight: 700; }
+.verdict { border-radius: 8px; padding: 9px 11px; font-weight: 700; font-size: 13.5px; background: var(--bg); border: 1px solid var(--line); }
+.verdict.on { background: color-mix(in srgb, #16a34a 16%, var(--bg)); border-color: #16a34a; }
+.result { border-radius: 8px; padding: 9px 11px; font-size: 13px; line-height: 1.8; }
+.result.ok { background: color-mix(in srgb, #16a34a 14%, var(--bg)); border: 1px solid #16a34a; }
+.result.bad { background: color-mix(in srgb, #dc2626 14%, var(--bg)); border: 1px solid #dc2626; }
+.log { display: grid; gap: 6px; font-size: 12.5px; line-height: 1.7; max-height: 260px; overflow: auto; }
+.log div { border-inline-start: 3px solid var(--line); padding-inline-start: 8px; }
+.log .t { font-family: var(--f-num); font-size: 11px; color: var(--muted); direction: ltr; display: inline-block; margin-inline-end: 6px; }
+.log .on { border-color: #16a34a; } .log .off { border-color: #64748b; } .log .pre { border-color: #3b82f6; } .log .warn { border-color: #dc2626; } .log .muted { color: var(--muted); }
+select { font: inherit; font-size: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); padding: 3px 6px; }
+</style>
+
+<div class="app">
+  <header>
+    <div class="brand"><span class="lamp" aria-hidden="true"></span><b>EVP-12</b><span>اولویت‌دهی جهت‌دار خودروی امدادی</span></div>
+    <nav class="tabs" role="tablist" aria-label="بخش">
+      <button role="tab" id="tab-SIM" data-g="SIM" aria-selected="false">شبیه‌سازی تقاطع</button>
+      <button role="tab" id="tab-DH" data-g="DH" aria-selected="true">هد گیرنده</button>
+      <button role="tab" id="tab-VTU" data-g="VTU" aria-selected="false">فرستنده خودرو</button>
+      <button role="tab" id="tab-CU" data-g="CU" aria-selected="false">کنترلر کابینت</button>
+    </nav>
+  </header>
+  <div class="work">
+    <aside>
+      <div id="partsUI">
+        <section>
+          <h2>نمای انفجاری</h2>
+          <div class="explode"><input id="explode" type="range" min="0" max="1" step="0.01" value="0" aria-label="نمای انفجاری"><span id="explodeVal" class="dim">0%</span></div>
+          <div class="toggles"><label><input type="checkbox" id="showLabels" checked> نمایش نام قطعات روی مدل</label></div>
+          <dl class="facts" id="facts"></dl>
+        </section>
+        <section>
+          <h2>قطعات · برای توضیح روی نام یا خود قطعه کلیک کنید</h2>
+          <div class="parts" id="parts"></div>
+          <div class="row"><button class="btn primary" id="dlAll">دانلود STL همه‌ی قطعات این بخش</button></div>
+          <p class="note">STLها با ابعاد فعلی، در جهت چاپ و روی صفحه‌ی چاپگر ساخته می‌شوند. اینجا به صورت فایل zip تحویل می‌شوند؛ در فایل آفلاین هر قطعه مستقیم .stl است.</p>
+          <div class="toast" id="toast" role="status"></div>
+        </section>
+        <section>
+          <h2>ابعاد این بخش</h2>
+          <div id="params" class="parts"></div>
+          <div class="row"><button class="btn" id="reset">بازگشت به پیش‌فرض</button></div>
+        </section>
+        <section>
+          <h2>تنظیمات عمومی</h2>
+          <div id="gparams" class="parts"></div>
+        </section>
+        <section>
+          <h2>پارامترهای فعلی (برای <span dir="ltr">build_stl.js</span>)</h2>
+          <textarea id="json" readonly aria-label="پارامترها"></textarea>
+          <div class="row"><button class="btn" id="copy">کپی</button></div>
+        </section>
+      </div>
+      <div id="simUI" hidden>
+        <section>
+          <h2>سناریو</h2>
+          <div class="scen" id="scen"></div>
+          <div class="expect" id="expect"></div>
+          <div class="row">
+            <button class="btn primary" id="play">توقف</button>
+            <button class="btn" id="restart">از اول</button>
+            <label class="row" style="gap:6px;font-size:12.5px">سرعت
+              <select id="speed"><option value="1">۱×</option><option value="2" selected>۲×</option><option value="4">۴×</option></select></label>
+          </div>
+          <div class="toggles">
+            <label><input type="checkbox" id="tFov" checked> زاویه‌ی دید هدها (نارنجی)</label>
+            <label><input type="checkbox" id="tCorr" checked> کریدورهای GPS (آبی)</label>
+            <label><input type="checkbox" id="tSun"> آفتاب شدید (برد IR حدود ۷۵ متر)</label>
+            <label><input type="checkbox" id="tFollow"> دوربین دنبال آمبولانس</label>
+          </div>
+        </section>
+        <section>
+          <h2>چراغ‌ها و حسگرها، لحظه‌به‌لحظه</h2>
+          <table class="live"><thead><tr><th>مسیر</th><th>IR در هد</th><th>GPS</th><th>چراغ</th></tr></thead><tbody id="liveRows"></tbody></table>
+          <div class="verdict" id="verdict"></div>
+          <div class="kv" id="kv"></div>
+          <div id="result"></div>
+        </section>
+        <section>
+          <h2>رویدادهای کنترلر</h2>
+          <div class="log" id="log"></div>
+        </section>
+        <section>
+          <h2>این شبیه‌سازی چه نشان می‌دهد</h2>
+          <p class="note">آمبولانس دو چیز می‌فرستد. اول، فریم‌های نوری مادون‌قرمز ۱۲ بار در ثانیه رو به جلو؛ چشمک قرمز جلوی خودرو و خط نارنجی تا هدی که آن را گرفته. دوم، هر ثانیه یک بسته‌ی رادیویی LoRa با موقعیت GPS و امضای رمز؛ حلقه‌ی آبی و خط آبی تا آنتن کابینت.</p>
+          <p class="note">هر هد فقط داخل مخروط نارنجی خودش را می‌بیند، یعنی همان خیابان. کنترلر فقط وقتی چراغ یک مسیر را سبز می‌کند که خودرو داخل کریدور GPS همان مسیر باشد، رو به تقاطع بیاید، و اگر IR دیده شده، از هد همان مسیر باشد. منطق همان فریمور evp_rx است.</p>
+        </section>
+      </div>
+    </aside>
+    <div class="bay">
+      <canvas id="view" aria-label="نمای سه‌بعدی"></canvas>
+      <div class="labels" id="labels"></div>
+      <div class="axes" id="axes">X <span style="color:#d04a3a">●</span> Y <span style="color:#3a9a4a">●</span> Z <span style="color:#3a6ad0">●</span> · mm</div>
+      <div class="info" id="info" hidden></div>
+      <div class="hint" id="hint">روی هر قطعه کلیک کنید تا بدانید چیست و چرا لازم است</div>
+      <div class="legend" id="legend" hidden>
+        <span><i style="background:#ff3030"></i>فریم IR ۱۲ هرتز (چشمک جلوی خودرو)</span>
+        <span><i style="background:#f0ab1f"></i>فریم دریافت‌شده در هد</span>
+        <span><i style="background:#3b82f6"></i>بسته‌ی LoRa + GPS به کابینت</span>
+        <span><i style="background:#a855f7"></i>بازتاب از نما</span>
+        <span><i style="background:#22c55e"></i>رنگ خط ایست = وضعیت چراغ</span>
+      </div>
+      <div class="hud" id="hud" style="left:12px; right:auto"><span class="dot"></span><span id="hudText">آماده</span></div>
+    </div>
+  </div>
+</div>
+
+<script>/*@@THREE@@*/</script>
+<script>/*@@ORBIT@@*/</script>
+<script>/*@@JSCAD@@*/</script>
+<script>/*@@PARTS@@*/</script>
+<script>/*@@MESH@@*/</script>
+<script>/*@@INFO@@*/</script>
+<script>/*@@SIM@@*/</script>
+<script>
+(function () {
+  const jscad = window.jscadModeling;
+  const EVP = window.EVPParts(jscad);
+  const M = window.EVPMesh;
+  const INFO = window.EVP_INFO;
+  const GROUPS = { SIM: 1, VTU: 1, DH: 1, CU: 1 };
+  const GROUP_PARAM = { VTU: 'فرستنده خودرو', DH: 'هد گیرنده', CU: 'کنترلر کابینت' };
+  const DEF = EVP.defaults();
+  let P = Object.assign({}, DEF);
+  try { const s = JSON.parse(localStorage.getItem('evp12-params') || 'null'); if (s) Object.assign(P, s); } catch (e) {}
+  let group = 'SIM';
+  try { const g = localStorage.getItem('evp12-group'); if (g && GROUPS[g]) group = g; } catch (e) {}
+  if (location.hash && GROUPS[location.hash.slice(1)]) group = location.hash.slice(1);
+  const hidden = new Set();
+  const $ = (id) => document.getElementById(id);
+
+  // ---------------------------------------------------------------- three.js scene (Z up)
+  const canvas = $('view');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, 1, 20000);
+  camera.up.set(0, 0, 1);
+  const controls = new THREE.OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.dampingFactor = 0.12;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x445566, 0.85));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(300, -400, 600); scene.add(sun);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-400, 300, 200); scene.add(fill);
+  const root = new THREE.Group(); scene.add(root);
+  const sim = window.EVPSim(THREE, scene);
+  let grid = null;
+
+  function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function applyTheme() {
+    scene.background = new THREE.Color(cssVar('--viewport') || '#dfe5eb');
+    if (grid) grid.material.color = new THREE.Color(cssVar('--grid'));
+  }
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+  new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  function resize() {
+    const r = canvas.parentElement.getBoundingClientRect();
+    renderer.setSize(r.width, r.height, false);
+    camera.aspect = r.width / Math.max(1, r.height); camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(canvas.parentElement);
+
+  function toThree(g) {
+    const polys = jscad.geometries.geom3.toPolygons(g); const pos = [];
+    for (const p of polys) { const v = p.vertices; for (let i = 1; i < v.length - 1; i++) pos.push(...v[0], ...v[i], ...v[i + 1]); }
+    const bg = new THREE.BufferGeometry();
+    bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    bg.computeVertexNormals(); bg.computeBoundingBox();
+    return bg;
+  }
+
+  // ---------------------------------------------------------------- build parts
+  let items = [];   // {key, label, mesh, ex, ref}
+  let selected = null;
+  const hud = $('hud'), hudText = $('hudText');
+  function busy(on, txt) { hud.classList.toggle('busy', on); hudText.textContent = txt; }
+
+  function build(fit) {
+    busy(true, 'در حال ساخت مدل…');
+    setTimeout(() => {
+      const t0 = performance.now();
+      const Pv = Object.assign({}, P, { seg: Math.min(P.seg, 40) });
+      for (const it of items) { root.remove(it.mesh); it.mesh.geometry.dispose(); }
+      items = [];
+      const pl = EVP.placements(Pv);
+      for (const [key, info] of Object.entries(EVP.PARTS)) {
+        if (info.group !== group) continue;
+        const g = pl[key].at(EVP.build(key, Pv));
+        const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(...info.color), roughness: 0.62, metalness: 0.05, flatShading: true, emissive: 0x000000 });
+        const mesh = new THREE.Mesh(toThree(g), mat); mesh.userData.key = key;
+        const bb = jscad.measurements.measureBoundingBox(EVP.build(key, Pv));
+        items.push({ key, label: (INFO[key] && INFO[key].t) || info.fa, mat: info.mat, color: info.color, mesh, ex: pl[key].ex, ref: false, size: bb[1].map((v, i) => v - bb[0][i]) });
+        root.add(mesh);
+      }
+      EVP.references(Pv).filter(r => r.group === group).forEach(r => {
+        const a = r.color[3] ?? 1;
+        const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(r.color[0], r.color[1], r.color[2]), roughness: 0.5, metalness: r.key === 'ref_pole' || r.key === 'ref_din' ? 0.35 : 0.05, transparent: true, opacity: a < 1 ? a : 0.92, flatShading: true, emissive: 0x000000 });
+        const mesh = new THREE.Mesh(toThree(r.g), mat); mesh.userData.key = r.key;
+        items.push({ key: r.key, label: (INFO[r.key] && INFO[r.key].t) || r.fa, mesh, ex: r.ex, ref: true, color: r.color });
+        root.add(mesh);
+      });
+      applyExplode(); applyVisibility(); renderParts(); renderFacts(); buildPartLabels(); highlight();
+      if (fit) fitView();
+      busy(false, 'ساخته شد در ' + Math.round(performance.now() - t0) + ' ms');
+    }, 30);
+  }
+
+  function applyExplode() {
+    const e = +$('explode').value;
+    $('explodeVal').textContent = Math.round(e * 100) + '%';
+    for (const it of items) it.mesh.position.set(it.ex[0] * e * 1.4, it.ex[1] * e * 1.4, it.ex[2] * e * 1.4);
+  }
+  function applyVisibility() { for (const it of items) it.mesh.visible = !hidden.has(it.key); }
+
+  function fitView() {
+    const box = new THREE.Box3();
+    for (const it of items) if (it.key !== 'ref_pole') box.expandByObject(it.mesh);
+    const c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3()).length();
+    controls.target.copy(c);
+    const dir = new THREE.Vector3(1.0, -1.25, 0.75).normalize();
+    camera.position.copy(c.clone().add(dir.multiplyScalar(s * 1.45)));
+    camera.near = s / 100; camera.far = s * 50; camera.updateProjectionMatrix();
+    if (grid) scene.remove(grid);
+    const all = new THREE.Box3(); for (const it of items) all.expandByObject(it.mesh);
+    grid = new THREE.GridHelper(Math.ceil(s * 1.6 / 50) * 50, Math.ceil(s * 1.6 / 10), cssVar('--grid'), cssVar('--grid'));
+    grid.rotation.x = Math.PI / 2; grid.position.set(c.x, c.y, all.min.z - 0.5);
+    grid.material.transparent = true; grid.material.opacity = 0.6;
+    scene.add(grid); applyTheme();
+  }
+
+  // ---------------------------------------------------------------- labels over the 3D view
+  const labelHost = $('labels');
+  let labelEls = [];   // {el, pos: () => Vector3}
+  function clearLabels() { labelHost.innerHTML = ''; labelEls = []; }
+  function addLabel(text, posFn, cls, onClick) {
+    const el = document.createElement('div'); el.className = 'lbl' + (cls ? ' ' + cls : ''); el.textContent = text;
+    if (onClick) el.addEventListener('click', (e) => { e.stopPropagation(); onClick(); });
+    labelHost.append(el); const L = { el, pos: posFn }; labelEls.push(L); return L;
+  }
+  function buildPartLabels() {
+    clearLabels();
+    if (!$('showLabels').checked) return;
+    for (const it of items) {
+      const bb = it.mesh.geometry.boundingBox;
+      const L = addLabel(it.label, () => new THREE.Vector3((bb.min.x + bb.max.x) / 2, (bb.min.y + bb.max.y) / 2, bb.max.z + 2).add(it.mesh.position),
+        it.ref ? 'ref' : '', () => select(it.key));
+      L.key = it.key; L.item = it;
+    }
+  }
+  const tmp = new THREE.Vector3();
+  function updateLabels() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    for (const L of labelEls) {
+      if (L.item && !L.item.mesh.visible) { L.el.hidden = true; continue; }
+      tmp.copy(L.pos()).project(camera);
+      const vis = tmp.z < 1 && tmp.z > -1 && Math.abs(tmp.x) < 1.05 && Math.abs(tmp.y) < 1.05;
+      L.el.hidden = !vis;
+      if (vis) { L.el.style.left = ((tmp.x + 1) / 2 * w) + 'px'; L.el.style.top = ((1 - tmp.y) / 2 * h) + 'px'; }
+      if (L.key) L.el.classList.toggle('sel', L.key === selected);
+    }
+  }
+
+  // ---------------------------------------------------------------- click a part -> what / why / use
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  let down = null;
+  canvas.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY]; });
+  canvas.addEventListener('pointerup', (e) => {
+    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5 || group === 'SIM') return;
+    const r = canvas.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hits = ray.intersectObjects(items.filter(i => i.mesh.visible).map(i => i.mesh), false);
+    select(hits.length ? hits[0].object.userData.key : null);
+  });
+  function select(key) {
+    selected = key; highlight();
+    const box = $('info');
+    if (!key) { box.hidden = true; $('hint').hidden = false; return; }
+    const it = items.find(i => i.key === key), inf = INFO[key];
+    const spec = it && !it.ref ? '<div class="spec">' + it.key + '.stl · ' + it.size.map(v => Math.round(v)).join(' × ') + ' mm · ' + it.mat + '</div>' : '<div class="spec">' + (it && it.ref ? 'قطعه‌ی خریدنی یا مرجع؛ چاپ نمی‌شود' : '') + '</div>';
+    box.innerHTML = '<h3><span>' + (inf ? inf.t : key) + '</span><button id="infoClose" aria-label="بستن">✕</button></h3>' + spec +
+      (inf ? '<dl><dt>چیست</dt><dd>' + inf.what + '</dd><dt>چرا لازم است</dt><dd>' + inf.why + '</dd><dt>به چه کار ما می‌آید</dt><dd>' + inf.use + '</dd></dl>' : '');
+    box.hidden = false; $('hint').hidden = true;
+    $('infoClose').onclick = () => select(null);
+  }
+  function highlight() {
+    for (const it of items) it.mesh.material.emissive.setHex(it.key === selected ? 0x6b4a00 : 0x000000);
+    document.querySelectorAll('.part').forEach(r => r.classList.toggle('sel', r.dataset.key === selected));
+  }
+
+  // ---------------------------------------------------------------- side panel (parts)
+  const fmt = (n, d = 1) => (Math.round(n * 10 ** d) / 10 ** d).toString();
+  function renderParts() {
+    const host = $('parts'); host.innerHTML = '';
+    for (const it of items) {
+      const row = document.createElement('div'); row.className = 'part' + (it.ref ? ' ref' : ''); row.dataset.key = it.key;
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = 'vis-' + it.key; cb.checked = !hidden.has(it.key);
+      cb.setAttribute('aria-label', 'نمایش ' + it.label);
+      cb.onchange = () => { cb.checked ? hidden.delete(it.key) : hidden.add(it.key); applyVisibility(); };
+      const sw = document.createElement('span'); sw.className = 'sw';
+      sw.style.background = 'rgb(' + it.color.slice(0, 3).map(x => Math.round(x * 255)).join(',') + ')';
+      const meta = document.createElement('div'); meta.className = 'meta';
+      const name = document.createElement('button'); name.className = 'btn'; name.style.cssText = 'border:0;background:transparent;padding:0;text-align:right;font-size:13px;color:var(--ink)';
+      name.textContent = it.label; name.onclick = () => select(it.key);
+      const sm = document.createElement('small');
+      sm.innerHTML = it.ref ? 'مرجع (چاپ نمی‌شود)' : it.mat + ' · <span class="dim">' + it.size.map(v => fmt(v, 0)).join('×') + ' mm</span>';
+      meta.append(name, sm);
+      row.append(cb, sw, meta);
+      if (!it.ref) { const b = document.createElement('button'); b.className = 'btn'; b.textContent = 'STL'; b.onclick = () => exportStl(it.key); row.append(b); }
+      else row.append(document.createElement('span'));
+      host.append(row);
+    }
+  }
+
+  function renderFacts() {
+    const d = EVP.dims, f = [];
+    if (group === 'DH') {
+      const h = Math.atan(P.hood_W / 2 / P.hood_L) * 180 / Math.PI, v = Math.atan(P.hood_H / 2 / P.hood_L) * 180 / Math.PI;
+      const dh = d.dhDims(P);
+      f.push(['زاویه‌ی دید افقی', '±' + fmt(h) + '°'], ['زاویه‌ی دید عمودی', '±' + fmt(v) + '°'],
+             ['پوشش عرضی در ۱۰۰ متری', fmt(2 * 100 * Math.tan(h * Math.PI / 180), 0) + ' m'],
+             ['فیلتر IR-pass (۲ mm)', fmt(dh.winW + 5.4) + ' × ' + fmt(dh.winH + 5.4) + ' mm'],
+             ['پرف‌بورد گیرنده', fmt(dh.W - 2 * dh.t + 2.6) + ' × 44 mm'],
+             ['قطر تیر', P.pole_D + ' mm']);
+    } else if (group === 'VTU') {
+      const v = d.vtuDims(P);
+      f.push(['تعداد LED', P.led_cols * P.led_rows + ' (' + P.led_cols + '×' + P.led_rows + ')'],
+             ['دهانه‌ی پنجره', fmt(v.winW) + ' × ' + fmt(v.winH) + ' mm'],
+             ['اکریلیک IR-pass (۳ mm)', fmt(v.winW + 2 * v.pocket - 0.6) + ' × ' + fmt(v.winH + 2 * v.pocket - 0.6) + ' mm'],
+             ['ابعاد کلی', P.vtu_L + ' × ' + P.vtu_W + ' × ' + (P.vtu_H + P.vtu_lid_H) + ' mm']);
+    } else if (group === 'CU') {
+      f.push(['ابعاد جعبه', P.cu_L + ' × ' + P.cu_W + ' × ' + P.cu_H + ' mm'], ['برد اصلی (سوراخ‌ها)', P.pcb_ax + ' × ' + P.pcb_ay + ' mm'],
+             ['برد رله (سوراخ‌ها)', P.rly_x + ' × ' + P.rly_y + ' mm'], ['ریل', 'DIN 35 mm']);
+    }
+    $('facts').innerHTML = f.map(([a, b]) => '<dt>' + a + '</dt><dd>' + b + '</dd>').join('');
+    $('json').value = JSON.stringify(diff(), null, 1);
+  }
+  function diff() { const o = {}; for (const k in P) if (P[k] !== DEF[k]) o[k] = P[k]; return o; }
+
+  function paramRow([key, def, min, max, step, , label]) {
+    const w = document.createElement('div'); w.className = 'param' + (P[key] !== def ? ' changed' : '');
+    w.innerHTML = '<label for="p-' + key + '">' + label + '</label><input type="number" id="pn-' + key + '" min="' + min + '" max="' + max + '" step="' + step + '" value="' + P[key] + '" aria-label="' + label + '"><input type="range" id="p-' + key + '" min="' + min + '" max="' + max + '" step="' + step + '" value="' + P[key] + '">';
+    const r = w.querySelector('input[type=range]'), n = w.querySelector('input[type=number]');
+    const set = (val) => { val = Math.min(max, Math.max(min, +val)); if (!isFinite(val)) return; P[key] = val; r.value = val; n.value = val;
+      w.classList.toggle('changed', val !== def); save(); schedule(); };
+    r.oninput = () => set(r.value); n.onchange = () => set(n.value);
+    return w;
+  }
+  function renderParams() {
+    const host = $('params'), gh = $('gparams');
+    host.innerHTML = ''; gh.innerHTML = '';
+    for (const p of EVP.PARAMS) {
+      if (p[5] === GROUP_PARAM[group]) host.append(paramRow(p));
+      else if (p[5] === 'عمومی') gh.append(paramRow(p));
+    }
+  }
+  let timer = null;
+  function schedule() { clearTimeout(timer); busy(true, 'در انتظار…'); timer = setTimeout(() => build(false), 350); }
+  function save() { try { localStorage.setItem('evp12-params', JSON.stringify(diff())); } catch (e) {} }
+
+  // ---------------------------------------------------------------- STL export
+  const toast = $('toast');
+  const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  function zip(files) {
+    const parts = [], central = []; let off = 0;
+    for (const f of files) {
+      const name = new TextEncoder().encode(f.name), d = f.bytes, crc = crc32(d);
+      const h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(8, 0, true);
+      h.setUint32(14, crc, true); h.setUint32(18, d.length, true); h.setUint32(22, d.length, true); h.setUint16(26, name.length, true);
+      parts.push(new Uint8Array(h.buffer), name, d);
+      const c = new DataView(new ArrayBuffer(46));
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true);
+      c.setUint32(16, crc, true); c.setUint32(20, d.length, true); c.setUint32(24, d.length, true); c.setUint16(28, name.length, true); c.setUint32(42, off, true);
+      central.push(new Uint8Array(c.buffer), name);
+      off += 30 + name.length + d.length;
+    }
+    const csize = central.reduce((a, b) => a + b.length, 0);
+    const e = new DataView(new ArrayBuffer(22));
+    e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, csize, true); e.setUint32(16, off, true);
+    return new Blob([...parts, ...central, new Uint8Array(e.buffer)], { type: 'application/zip' });
+  }
+  let dlCap = null, dlChecked = false;
+  async function downloadsCap() {
+    if (!dlChecked) { dlChecked = true; try { dlCap = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dlCap = null; } }
+    return dlCap;
+  }
+  function plainDownload(name, data) {
+    const url = URL.createObjectURL(data instanceof Blob ? data : new Blob([data], { type: 'model/stl' }));
+    const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+  async function offer(zipName, files) {
+    const cap = await downloadsCap();
+    if (cap) {
+      try { await cap.save({ filename: zipName, data: zip(files) }); toast.textContent = zipName + ' ذخیره شد'; }
+      catch (e) { toast.textContent = e && e.code === 'declined' ? 'ذخیره لغو شد' : 'ذخیره در این نما ممکن نیست؛ فایل آفلاین EVP-12-3D.html را باز کنید'; }
+    } else if (files.length === 1) plainDownload(files[0].name, files[0].bytes);
+    else plainDownload(zipName, zip(files));
+  }
+  function meshFile(key) {
+    const { tris } = M.printMesh(jscad, EVP, key, P);
+    return { name: 'evp12_' + key + '.stl', bytes: M.stlBytes(tris, key), n: tris.length, open: M.openEdges(tris) };
+  }
+  function exportStl(key) {
+    busy(true, 'ساخت STL ' + key + '…');
+    setTimeout(async () => {
+      const f = meshFile(key);
+      busy(false, 'آماده');
+      toast.textContent = f.name + ' · ' + f.n + ' مثلث' + (f.open ? ' · ' + f.open + ' لبه‌ی باز' : ' · مش بسته');
+      await offer('evp12_' + key + '.zip', [f]);
+    }, 30);
+  }
+  $('dlAll').onclick = () => {
+    const keys = Object.entries(EVP.PARTS).filter(([, i]) => i.group === group).map(([k]) => k);
+    busy(true, 'ساخت ' + keys.length + ' فایل STL…');
+    setTimeout(async () => { const files = keys.map(meshFile); busy(false, 'آماده'); await offer('evp12_' + group + '_stl.zip', files); }, 30);
+  };
+
+  // ---------------------------------------------------------------- simulation panel
+  const NUM = (n) => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+  let scenId = 'N';
+  const simUI = {
+    reset(sc) {
+      $('log').innerHTML = ''; $('result').innerHTML = '';
+      $('expect').innerHTML = sc.desc + '<br><b>انتظار:</b> ' + sc.exp;
+      document.querySelectorAll('#scen button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === sc.id)));
+    },
+    log(t, text, kind) {
+      const d = document.createElement('div'); d.className = kind || '';
+      d.innerHTML = '<span class="t">' + t.toFixed(1) + ' s</span>'; d.append(document.createTextNode(text));
+      $('log').prepend(d);
+    },
+    result(ok, text) {
+      $('result').innerHTML = '<div class="result ' + (ok ? 'ok' : 'bad') + '">' + (ok ? '✓ مطابق انتظار: ' : '✗ ') + text + '</div>';
+      $('play').textContent = 'اجرای دوباره';
+    },
+    sunny: () => $('tSun').checked, showFov: () => $('tFov').checked, showCorr: () => $('tCorr').checked,
+  };
+  sim.scenarios.forEach(sc => {
+    const b = document.createElement('button'); b.textContent = sc.fa; b.dataset.id = sc.id; b.setAttribute('aria-pressed', 'false');
+    b.onclick = () => { scenId = sc.id; startSim(); };
+    $('scen').append(b);
+  });
+  function startSim() { sim.start(scenId, simUI); $('play').textContent = 'توقف'; buildSimLabels(); }
+  $('play').onclick = () => {
+    const st = sim.status();
+    if (st && st.done) return startSim();
+    sim.pause(!sim.paused()); $('play').textContent = sim.paused() ? 'ادامه' : 'توقف';
+  };
+  $('restart').onclick = startSim;
+  function buildSimLabels() {
+    clearLabels();
+    const L = sim.labels();
+    L.forEach((l, i) => { const x = addLabel(l.text, () => { const c = sim.labels()[i]; return new THREE.Vector3(c.p[0], c.p[1], c.p[2]); }, l.cls); x.simIndex = i; });
+  }
+  function updateSimPanel() {
+    const s = sim.status(); if (!s) return;
+    const lampFa = { G: 'سبز', Y: 'زرد', R: 'قرمز' };
+    $('liveRows').innerHTML = s.rows.map(r =>
+      '<tr><td>' + r.name + '</td><td>' + (r.irN ? '<span class="irbar" style="width:' + Math.min(48, r.irN * 4) + 'px"></span>' + NUM(r.irN) + ' فریم/ث' + (r.irLvl >= 0 ? ' · ' + ['پایین', 'متوسط', 'بالا'][r.irLvl] : '') : '<span style="color:var(--muted)">—</span>') +
+      '</td><td>' + r.gps + '</td><td><span class="chip ' + r.lamp + '">' + lampFa[r.lamp] + '</span></td></tr>').join('');
+    const v = $('verdict'); v.textContent = s.verdict.text; v.classList.toggle('on', s.verdict.on);
+    $('kv').innerHTML = '<div><b>فرستنده: </b>' + (s.siren ? 'IR ۱۲ فریم در ثانیه + LoRa هر ۱ ثانیه' : 'خاموش') + '</div>' +
+      '<div><b>LoRa: </b>' + s.lora + '</div><div><b>GPS: </b>' + s.gps + '</div><div><b>کنترلر: </b>' + s.ctrl + '</div>';
+    labelEls.forEach(L => { if (L.simIndex !== undefined) { const c = sim.labels()[L.simIndex]; if (c) L.el.className = 'lbl' + (c.cls ? ' ' + c.cls : ''); } });
+  }
+
+  // ---------------------------------------------------------------- mode switching
+  function setGroup(g) {
+    group = g;
+    document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', String(x.dataset.g === g)));
+    try { localStorage.setItem('evp12-group', g); } catch (e) {}
+    const isSim = g === 'SIM';
+    $('partsUI').hidden = isSim; $('simUI').hidden = !isSim;
+    $('legend').hidden = !isSim; $('hint').hidden = isSim; $('info').hidden = true; $('axes').hidden = isSim;
+    root.visible = !isSim; sim.group.visible = isSim; if (grid) grid.visible = !isSim;
+    selected = null;
+    if (isSim) {
+      camera.near = 0.5; camera.far = 6000; camera.updateProjectionMatrix();
+      controls.target.set(0, 30, 0); camera.position.set(-170, -230, 210);
+      startSim();
+    } else { sim.pause(true); hidden.clear(); renderParams(); build(true); }
+  }
+  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => setGroup(b.dataset.g));
+  $('explode').oninput = applyExplode;
+  $('showLabels').onchange = buildPartLabels;
+  $('reset').onclick = () => {
+    for (const p of EVP.PARAMS) if (p[5] === GROUP_PARAM[group] || p[5] === 'عمومی') P[p[0]] = p[1];
+    save(); renderParams(); build(false);
+  };
+  $('copy').onclick = () => {
+    const t = $('json');
+    try { navigator.clipboard.writeText(t.value).then(() => { toast.textContent = 'پارامترها کپی شد'; }, () => t.select()); } catch (e) { t.select(); }
+  };
+
+  resize(); applyTheme(); setGroup(group);
+  let last = performance.now(), panelT = 0;
+  (function loop(now) {
+    const dt = Math.max(0, ((now || performance.now()) - last) / 1000); last = now || performance.now();
+    if (group === 'SIM') {
+      sim.advance(dt, +$('speed').value);
+      if ($('tFollow').checked) { const p = sim.vehicle(); const tgt = new THREE.Vector3(p[0], p[1], 0); const d = tgt.clone().sub(controls.target); controls.target.add(d); camera.position.add(d); }
+      panelT += dt; if (panelT > 0.15) { panelT = 0; updateSimPanel(); }
+    }
+    controls.update(); renderer.render(scene, camera); updateLabels();
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
